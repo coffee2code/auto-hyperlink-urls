@@ -7,12 +7,11 @@ Author: Scott Reilly
 Author URI: http://www.coffee2code.com
 Description: Automatically hyperlink text URLs and email addresses that appear in plaintext in post content and comments.
 
-This plugin seeks to address certain shortcomings with WordPress's default auto-hyperlinking function 
-(make_clickable()) (which itself was borrowed from phpBB).  This tweaks the pattern matching expressions to prevent 
-inappropriate adjacent characters from becoming part of the link (such as a trailing period when a link ends a sentence, 
-links that are parenthesized or braced, comma-separated, etc) and it prevents invalid text from becoming a mailto: 
-link (i.e. smart@ss) or for invalid URIs (i.e. http://blah) from becoming links.  In addition, this plugin adds 
-configurability to the auto-hyperlinker such that you can configure:
+This plugin seeks to address certain shortcomings with WordPress's default auto-hyperlinking function.  This tweaks the 
+pattern matching expressions to prevent inappropriate adjacent characters from becoming part of the link (such as a 
+trailing period when a link ends a sentence, links that are parenthesized or braced, comma-separated, etc) and it prevents
+invalid text from becoming a mailto: link (i.e. smart@ss) or for invalid URIs (i.e. http://blah) from becoming links.  In 
+addition, this plugin adds configurability to the auto-hyperlinker such that you can configure:
 
 - If you want text URLs to only show the hostname
 - If you want text URLs truncated after N characters
@@ -91,7 +90,7 @@ class AutoHyperlinkURLs {
 		
 		$this->config = array(
 			'hyperlink_comments' => array('input' => 'checkbox', 'default' => true,
-					'label' => 'Autohyperlink in comments?'),
+					'label' => 'Auto-hyperlink comments?'),
 			'hyperlink_emails' => array('input' => 'checkbox', 'default' => true, 
 					'label' => 'Hyperlink E-mails?'),
 			'open_in_new_window' => array('input' => 'checkbox', 'default' => true,
@@ -104,10 +103,10 @@ class AutoHyperlinkURLs {
 					'label' => 'Text to show after link truncation'),
 			'more_extensions' => array('input' => 'text', 'default' => '',
 					'label' => 'Extra domain extensions.',
-					'help' => 'Space and/or comma-separate list of extensions/<acronym title="Top Level Domains">TLDs</acronym>.
+					'help' => 'Space and/or comma-separate list of extensions/<acronym title="Top-Level Domains">TLDs</acronym>.
 								<br />These are already built-in: com, org, net, gov, edu, mil, us, info, biz, ws, name, mobi, cc, tv'),
 			'hyperlink_mode' => array('input' => 'select', 'default' => 0,
-					'label' => 'Hyperlink Mode',
+					'label' => 'Hyperlink Mode/Truncation',
 					'help' => 'This determines what text should appear as the link.  Use <code>0</code>
 								to show the full URL, use <code>1</code> to show just the hostname, or
 								use a value greater than <code>10</code> to indicate how many characters
@@ -160,22 +159,12 @@ class AutoHyperlinkURLs {
 		echo <<<END
 		<div class='wrap'>
 			<h2>Auto-Hyperlink URLs Plugin Options</h2>
-			<p>This plugin seeks to address certain shortcomings with WordPress's default auto-hyperlinking function 
-			(make_clickable()) (which itself was borrowed from phpBB).  This tweaks the pattern matching expressions to prevent 
-			inappropriate adjacent characters from becoming part of the link (such as a trailing period when a link ends a sentence, 
-			links that are parenthesized or braced, comma-separated, etc) and it prevents invalid text from becoming a mailto: 
-			link (i.e. smart@ss) or for invalid URIs (i.e. http://blah) from becoming links.  In addition, this plugin adds 
-			configurability to the auto-hyperlinker such that you can configure:</p>
-
-			<ul>
-			<li>If you want text URLs to only show the hostname</li>
-			<li>If you want text URLs truncated after N characters</li>
-			<li>If you want auto-hyperlinked URLs to open in new browser window or not</li>
-			<li>The text to come before and after the link text for truncated links</li>
-			<li>If you want nofollow to be supported</li>
-			<li>If you wish to support additional domain extensions not already configured into the plugin</li>
-			</ul>
-
+			<p>This plugin seeks to address certain shortcomings with WordPress's default auto-hyperlinking function.
+			This tweaks the pattern matching expressions to prevent inappropriate adjacent characters from becoming 
+			part of the link (such as a trailing period when a link ends a sentence, links that are parenthesized or 
+			braced, comma-separated, etc) and it prevents invalid text from becoming a mailto: link (i.e. smart@ss) 
+			or for invalid URIs (i.e. http://blah) from becoming links.</p>
+			
 			<p>This plugin will recognize any protocol-specified URI (http|https|ftp|news)://, etc, as well as e-mail addresses.  
 			It also adds the new ability to recognize Class B domain references (i.e. "somesite.net", not just domains prepended 
 			with "www.") as valid links (i.e. "wordpress.org" would now get auto-hyperlinked)</p>
@@ -196,7 +185,7 @@ END;
 					} else {
 						$checked = '';
 					};
-					echo "<tr valign='top'><th width='43%' scope='row'>$label : </th>";
+					echo "<tr valign='top'><th width='50%' scope='row'>$label : </th>";
 					echo "<td><input name='$opt' type='$input' id='$opt' value='$value' $checked/>";
 					if ($this->config[$opt]['help']) {
 						echo "<br /><span style='color:#777; font-size:x-small;'>";
@@ -225,17 +214,17 @@ END;
 				<p>In all cases, assume the following URL is appearing as plaintext in a post:<br />
 				<code>www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php</code></p>
 				
-				<p>And unless explicitly stated, the results are using default values (nofollow is false, hyperlink emails is true, hyperlink mode is 0)</p>
+				<p>And unless explicitly stated, the results are using default values (nofollow is false, hyperlink emails is true, Hyperlink Mode is 0)</p>
 				
 			<dl>
 				<dt>By default</dt>
-				<dd><a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" title="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" target="_blank">www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php</a></dd>
-				<dt>With mode set to 1</dt>
-				<dd><a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" title="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" target="_blank">www.somelonghost.com</a></dd>
-				<dt>With mode set to 15</dt>
-				<dd><a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" title="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" target="_blank">www.somelonghos...</a></dd>
-				<dt>With mode set to 15, nofollow set to true, open in new window set to false, truncation before of "[", truncation after of "...]"</dt>
-				<dd><a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" title="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" rel="nofollow">[www.somelonghos...]</a></dd>
+				<dd><a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php"  class="autohyperlink" title="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" target="_blank">www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php</a></dd>
+				<dt>With Hyperlink Mode set to 1</dt>
+				<dd><a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" title="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" class="autohyperlink" target="_blank">www.somelonghost.com</a></dd>
+				<dt>With Hyperlink Mode set to 15</dt>
+				<dd><a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" title="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" class="autohyperlink" target="_blank">www.somelonghos...</a></dd>
+				<dt>With Hyperlink Mode set to 15, nofollow set to true, open in new window set to false, truncation before of "[", truncation after of "...]"</dt>
+				<dd><a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" title="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" class="autohyperlink" rel="nofollow">[www.somelonghos...]</a></dd>
 			</dl>
 
 			</div>
