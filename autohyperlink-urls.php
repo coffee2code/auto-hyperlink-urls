@@ -276,10 +276,10 @@ endif;
 
 function autohyperlink_truncate_link ($url, $mode=0, $trunc_before='', $trunc_after='...', $more_extensions='') {
 	if (1 == $mode) {
-		$url = preg_replace("/(([a-z]+?):\\/\\/[A-Za-z0-9\-\.]+).*/i", "$1", $url);
+		$url = preg_replace("/(([a-z]+?):\\/\\/[a-z0-9\-\.]+).*/i", "$1", $url);
 		if ($more_extensions)
 		 	$more_extensions = '|' . implode('|', array_map('trim', explode('|', str_replace(array(', ', ' ', ','), '|', $more_extensions))));
-		$url = $trunc_before . preg_replace("/([A-Za-z0-9\-\.]+\.(com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv$more_extensions)).*/i", "$1", $url) . $trunc_after;
+		$url = $trunc_before . preg_replace("/([a-z0-9\-\.]+\.(com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv$more_extensions)).*/i", "$1", $url) . $trunc_after;
 	} elseif (($mode > 10) && (strlen($url) > $mode)) {
 		$url = $trunc_before . substr($url, 0, $mode) . $trunc_after;
 	}
@@ -293,20 +293,20 @@ function autohyperlink_link_urls ($text, $mode=0, $trunc_before='', $trunc_after
 	$text = ' ' . $text . ' ';
 
 	// Hyperlink anything with an explicit protocol
-	$text = preg_replace("#([\s{}\(\)\[\]])(([a-z]+?)://([A-Za-z_0-9\-]+\.([^\s{}\(\)\[\]]+[^\s,\.\;{}\(\)\[\]])))#ie",
+	$text = preg_replace("#([\s{}\(\)\[\]])(([a-z]+?)://([a-z_0-9\-]+\.([^\s{}\(\)\[\]]+[^\s,\.\;{}\(\)\[\]])))#ie",
 		"'$1<a href=\"$2\" title=\"$2\" $link_attributes>' . autohyperlink_truncate_link(\"$4\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'",
                 $text);
 
 	// Hyperlink Class B domains *.(com|org|net|gov|edu|us|info|biz|ws|name|cc|tv)(/*)
 	if ($more_extensions)
 	 	$more_extensions = '|' . implode('|', array_map('trim', explode('|', str_replace(array(', ', ' ', ','), '|', $more_extensions))));
-	$text = preg_replace("#([\s{}\(\)\[\]])([A-Za-z0-9\-\.]+[A-Za-z0-9\-])\.(com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv$more_extensions)((?:/[^\s{}\(\)\[\]]*[^\.,\s{}\(\)\[\]]?)?)#ie",
+	$text = preg_replace("#([\s{}\(\)\[\]])([a-z0-9\-\.]+[a-z0-9\-])\.(com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv$more_extensions)((?:/[^\s{}\(\)\[\]]*[^\.,\s{}\(\)\[\]]?)?)#ie",
 		"'$1<a href=\"http://$2.$3$4\" title=\"http://$2.$3$4\" $link_attributes>' . autohyperlink_truncate_link(\"$2.$3$4\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'",
 		$text);
 
 	// Hyperlink e-mail addresses
 	if ($hyperlink_emails) {
-		$text = preg_replace("#([\s{}\(\)\[\]])([A-Za-z0-9\-_\.]+?)@([^\s,{}\(\)\[\]]+\.[^\s.,{}\(\)\[\]]+)#ie",
+		$text = preg_replace("#([\s{}\(\)\[\]])([a-z0-9\-_\.]+?)@([^\s,{}\(\)\[\]]+\.[^\s.,{}\(\)\[\]]+)#ie",
 			"'$1<a class=\"autohyperlink\" href=\"mailto:$2@$3\" title=\"mailto:$2@$3\">' . autohyperlink_truncate_link(\"$2@$3\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'",
 			$text);
 	}
