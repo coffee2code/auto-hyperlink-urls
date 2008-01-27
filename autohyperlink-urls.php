@@ -24,6 +24,14 @@ This plugin will recognize any protocol-specified URI (http|https|ftp|news)://, 
 It also adds the new ability to recognize Class B domain references (i.e. "somesite.net", not just domains prepended 
 with "www.") as valid links (i.e. "wordpress.org" would now get auto-hyperlinked)
 
+Known issues:
+	Currently the plugin hyperlinks URLs that appear embedded within the middle of a longer string used as tag attribute value.
+	i.e. 
+	<a href="http://example.com" title="I go to http://example.com often">example.com</a>
+	comes out as:
+	<a href="http://example.com" title="I go to <a href="http://example.com" class="autohyperlink">http://example.com</a> often">example.com</a>
+	
+	
 Compatible with WordPress 2.0+, 2.1+, 2.2+, and 2.3+.
 
 =>> Read the accompanying readme.txt file for more information.  Also, visit the plugin's homepage
@@ -203,7 +211,7 @@ END;
 			</div>
 END;
 		echo <<<END
-		<div class='wrap' style="text-align:center;"><span style="color:#888;">This plugin brought to you by <a href="http://coffee2code.com" title="coffee2code.com">Scott Reilly, aka coffee2code</a></style></div>
+		<div class='wrap' style="text-align:center; color:#888;">This plugin brought to you by <a href="http://coffee2code.com" title="coffee2code.com">Scott Reilly, aka coffee2code</a>.<br /><span style="font-size:x-small;"><a href="http://coffee2code.com/donate">Did you find this plugin useful?</a></span></div>
 END;
 		echo <<<END
 			<div class='wrap'>
@@ -280,27 +288,31 @@ function autohyperlink_link_urls ($text, $mode=0, $trunc_before='', $trunc_after
 	if ($open_in_new_window) $link_attributes .= ' target="_blank"';
  	if ($nofollow) $link_attributes .= ' rel="nofollow"';
 	$text = ' ' . $text . ' ';
-
-	// Hyperlink anything with an explicit protocol
-	$text = preg_replace("#([\s{}\(\)\[\]])(([a-z]+?)://([a-z_0-9\-]+\.([^\s{}\(\)\[\]]+[^\s,\.\;{}\(\)\[\]])))#ie",
-		"'$1<a href=\"$2\" title=\"$2\" $link_attributes>' . autohyperlink_truncate_link(\"$4\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'",
-                $text);
-
-	// Hyperlink Class B domains *.(com|org|net|gov|edu|us|info|biz|ws|name|cc|tv)(/*)
+	$extensions = 'com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv';
 	if ($more_extensions)
-	 	$more_extensions = '|' . implode('|', array_map('trim', explode('|', str_replace(array(', ', ' ', ','), '|', $more_extensions))));
-	$text = preg_replace("#([\s{}\(\)\[\]])([a-z0-9\-\.]+[a-z0-9\-])\.(com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv$more_extensions)((?:/[^\s{}\(\)\[\]]*[^\.,\s{}\(\)\[\]]?)?)#ie",
-		"'$1<a href=\"http://$2.$3$4\" title=\"http://$2.$3$4\" $link_attributes>' . autohyperlink_truncate_link(\"$2.$3$4\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'",
-		$text);
+	 	$extensions .= '|' . implode('|', array_map('trim', explode('|', str_replace(array(', ', ' ', ','), '|', $more_extensions))));
 
-	// Hyperlink e-mail addresses
+	$patterns = array(
+		'#([\s{}\(\)\[\]])(([a-z]+?)://([a-z_0-9\-]+\.([^\s{}\(\)\[\]]+[^\s,\.\;{}\(\)\[\]])))#ie',
+		"#([\s{}\(\)\[\]])([a-z0-9\-\.]+[a-z0-9\-])\.($extensions)((?:/[^\s{}\(\)\[\]]*[^\.,\s{}\(\)\[\]]?)?)#ie"
+	);
+
+	$replacements = array(
+		"'$1<a href=\"$2\" title=\"$2\" $link_attributes>' . autohyperlink_truncate_link(\"$4\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'",
+		"'$1<a href=\"http://$2.$3$4\" title=\"http://$2.$3$4\" $link_attributes>' . autohyperlink_truncate_link(\"$2.$3$4\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'"
+	);
+	
 	if ($hyperlink_emails) {
-		$text = preg_replace("#([\s{}\(\)\[\]])([a-z0-9\-_\.]+?)@([^\s,{}\(\)\[\]]+\.[^\s.,{}\(\)\[\]]+)#ie",
-			"'$1<a class=\"autohyperlink\" href=\"mailto:$2@$3\" title=\"mailto:$2@$3\">' . autohyperlink_truncate_link(\"$2@$3\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'",
-			$text);
+		$patterns[] = '#([\s{}\(\)\[\]])([a-z0-9\-_\.]+?)@([^\s,{}\(\)\[\]]+\.[^\s.,{}\(\)\[\]]+)#ie';
+		$replacements[] = "'$1<a class=\"autohyperlink\" href=\"mailto:$2@$3\" title=\"mailto:$2@$3\">' . autohyperlink_truncate_link(\"$2@$3\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'";
 	}
+	
+	$text = preg_replace($patterns, $replacements, $text);
 
-	return substr($text,1,strlen($text)-2);
+	// Remove links within links
+	$text = preg_replace("#(<a( [^>]+?>|>))(.*)<a [^>]+?>([^>]+?)</a>(.*)</a>#i", "$1$3$4$5</a>", $text);
+
+	return trim($text);
 }
 
 ?>
