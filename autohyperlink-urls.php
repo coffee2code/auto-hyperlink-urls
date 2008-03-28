@@ -2,9 +2,9 @@
 /*
 Plugin Name: Auto-hyperlink URLs
 Version: 3.0
-Plugin URI: http://www.coffee2code.com/wp-plugins/
+Plugin URI: http://coffee2code.com/wp-plugins/autohyperlink-urls
 Author: Scott Reilly
-Author URI: http://www.coffee2code.com
+Author URI: http://coffee2code.com
 Description: Automatically hyperlink text URLs and email addresses that appear in plaintext in post content and comments.
 
 This plugin seeks to address certain shortcomings with WordPress's default auto-hyperlinking function.  This tweaks the 
@@ -31,19 +31,17 @@ Known issues:
 	comes out as:
 	<a href="http://example.com" title="I go to <a href="http://example.com" class="autohyperlink">http://example.com</a> often">example.com</a>
 	
+	It will also not hyperlink URLs that are immediately single- or double-quoted, i.e. 'http://example.com' or "http://example.com"
 	
-Compatible with WordPress 2.0+, 2.1+, 2.2+, and 2.3+.
+Compatible with WordPress 2.0+, 2.1+, 2.2+, 2.3+, and 2.5.
 
 =>> Read the accompanying readme.txt file for more information.  Also, visit the plugin's homepage
 =>> for more information and the latest updates
 
 Installation:
 
-1. Download the file http://www.coffee2code.com/wp-plugins/autohyperlink-urls.zip and unzip it into your 
+1. Download the file http://coffee2code.com/wp-plugins/autohyperlink-urls.zip and unzip it into your 
 /wp-content/plugins/ directory.
--OR-
-Copy and paste the the code ( http://www.coffee2code.com/wp-plugins/autohyperlink-urls.phps ) into a file called 
-autohyperlink-urls.php, and put that file into your /wp-content/plugins/ directory.
 2. Activate the plugin through the 'Plugins' admin menu in WordPress
 3. (optional) Modify any configuration options for the plugin by going to its admin configuration page at
 Options -> Autohyperlinks
@@ -93,7 +91,7 @@ class AutoHyperlinkURLs {
 		$options = $this->get_options();
 		if ($options['hyperlink_comments']) {
 			remove_filter('comment_text', array(&$this, 'make_clickable'));
-			add_filter('comment_text', array(&$this, 'hyperlink_urls', 9));
+			add_filter('comment_text', array(&$this, 'hyperlink_urls'), 9);
 		}
 		
 		$this->config = array(
@@ -182,7 +180,7 @@ class AutoHyperlinkURLs {
 			<form name="autohyperlink_urls" action="$action_url" method="post">	
 END;
 				wp_nonce_field($this->nonce_field);
-		echo '<fieldset class="option"><table width="100%" cellspacing="2" cellpadding="5" class="optiontable editform">';
+		echo '<table width="100%" cellspacing="2" cellpadding="5" class="optiontable editform form-table">';
 				foreach (array_keys($options) as $opt) {
 					$input = $this->config[$opt]['input'];
 					$label = $this->config[$opt]['label'];
@@ -193,7 +191,7 @@ END;
 					} else {
 						$checked = '';
 					};
-					echo "<tr valign='top'><th width='50%' scope='row'>$label : </th>";
+					echo "<tr valign='top'><th scope='row'>$label</th>";
 					echo "<td><input name='$opt' type='$input' id='$opt' value='$value' $checked/>";
 					if ($this->config[$opt]['help']) {
 						echo "<br /><span style='color:#777; font-size:x-small;'>";
@@ -204,14 +202,42 @@ END;
 				}
 		echo <<<END
 			</table>
-			</fieldset>
 			<input type="hidden" name="submitted" value="1" />
-			<div class="submit"><input type="submit" name="Submit" value="Update Options &raquo;" /></div>
+			<div class="submit"><input type="submit" name="Submit" value="Save Changes" /></div>
 		</form>
 			</div>
 END;
+		$logo = get_option('siteurl') . '/wp-content/plugins/' . basename($_GET['page'], '.php') . '/c2c_minilogo.png';
 		echo <<<END
-		<div class='wrap' style="text-align:center; color:#888;">This plugin brought to you by <a href="http://coffee2code.com" title="coffee2code.com">Scott Reilly, aka coffee2code</a>.<br /><span style="font-size:x-small;"><a href="http://coffee2code.com/donate">Did you find this plugin useful?</a></span></div>
+		<style type="text/css">
+			#c2c {
+				text-align:center;
+				color:#888;
+				background-color:#ffffef;
+				padding:5px 0 0;
+				margin-top:12px;
+				border-style:solid;
+				border-color:#dadada;
+				border-width:1px 0;
+			}
+			#c2c div {
+				margin:0 auto;
+				padding:5px 40px 0 0;
+				width:45%;
+				min-height:40px;
+				background:url('$logo') no-repeat top right;
+			}
+			#c2c span {
+				display:block;
+				font-size:x-small;
+			}
+		</style>
+		<div id='c2c' class='wrap'>
+			<div>
+			This plugin brought to you by <a href="http://coffee2code.com" title="coffee2code.com">Scott Reilly, aka coffee2code</a>.
+			<span><a href="http://coffee2code.com/donate" title="Please consider a donation">Did you find this plugin useful?</a></span>
+			</div>
+		</div>
 END;
 		echo <<<END
 			<div class='wrap'>
@@ -310,7 +336,7 @@ function autohyperlink_link_urls ($text, $mode=0, $trunc_before='', $trunc_after
 	$text = preg_replace($patterns, $replacements, $text);
 
 	// Remove links within links
-	$text = preg_replace("#(<a( [^>]+?>|>))(.*)<a [^>]+?>([^>]+?)</a>(.*)</a>#i", "$1$3$4$5</a>", $text);
+	$text = preg_replace("#(<a( [^>]+?>|>))<a [^>]+?>([^>]+?)</a></a>#i", "$1$3</a>", $text);
 
 	return trim($text);
 }
