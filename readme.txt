@@ -3,7 +3,7 @@ Contributors: coffee2code
 Donate link: http://coffee2code.com
 Tags: links, URLs, auto-link 
 Requires at least: 2.0.2
-Tested up to: 2.3.2
+Tested up to: 2.5
 Stable tag: trunk
 Version: 3.0
 
@@ -62,6 +62,15 @@ And unless explicitly stated, the results are using default values (nofollow is 
 
 * With Hyperlink Mode set to 15, nofollow set to true, open in new window set to false, truncation before of "[", truncation after of "...]"
 <a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" title="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" class="autohyperlink" rel="nofollow">[www.somelonghos...]</a>
+
+== Known Shortcomings ==
+
+* Currently the plugin hyperlinks URLs that appear embedded within the middle of a longer string used as tag attribute value, i.e.
+`<a href="http://example.com" title="I go to http://example.com often">example.com</a>`
+comes out as:
+`<a href="http://example.com" title="I go to <a href="http://example.com" class="autohyperlink">http://example.com</a> often">example.com</a>`
+  
+* It will also not auto-hyperlink URLs that are immediately single- or double-quoted, i.e. `'http://example.com'` or `"http://example.com"`
 
 == Screenshots ==
 
