@@ -44,7 +44,7 @@ Installation:
 /wp-content/plugins/ directory.
 2. Activate the plugin through the 'Plugins' admin menu in WordPress
 3. (optional) Modify any configuration options for the plugin by going to its admin configuration page at
-Options -> Autohyperlinks
+Options -> Autohyperlink (or in WP 2.5: Settings -> Autohyperlink)
 
 
 Example (when running with default configuration):

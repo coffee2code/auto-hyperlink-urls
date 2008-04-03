@@ -30,7 +30,7 @@ The following domain extensions (aka TLDs, Top-Level Domains) are recognized by 
 
 1. Unzip `autohyperlink-urls.zip` inside the `/wp-content/plugins/` directory, or upload `autohyperlink-urls.php` to `/wp-content/plugins/`
 1. Activate the plugin through the 'Plugins' admin menu in WordPress
-1. (optional) Modify any configuration options for the plugin by going to its admin configuration page at `Options` -> `Autohyperlinks`
+1. (optional) Modify any configuration options for the plugin by going to its admin configuration page at `Options` -> `Autohyperlink` (or in WP 2.5: `Settings` -> `Autohyperlink`)
 
 == Examples ==
 
