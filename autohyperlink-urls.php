@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Auto-hyperlink URLs
-Version: 3.0
+Version: 3.1
 Plugin URI: http://coffee2code.com/wp-plugins/autohyperlink-urls
 Author: Scott Reilly
 Author URI: http://coffee2code.com
@@ -33,7 +33,7 @@ Known issues:
 	
 	It will also not hyperlink URLs that are immediately single- or double-quoted, i.e. 'http://example.com' or "http://example.com"
 	
-Compatible with WordPress 2.0+, 2.1+, 2.2+, 2.3+, and 2.5.
+Compatible with WordPress 2.6+, 2.7+, 2.8+.
 
 =>> Read the accompanying readme.txt file for more information.  Also, visit the plugin's homepage
 =>> for more information and the latest updates
@@ -44,7 +44,7 @@ Installation:
 /wp-content/plugins/ directory.
 2. Activate the plugin through the 'Plugins' admin menu in WordPress
 3. (optional) Modify any configuration options for the plugin by going to its admin configuration page at
-Options -> Autohyperlink (or in WP 2.5: Settings -> Autohyperlink)
+Settings -> Autohyperlink
 
 
 Example (when running with default configuration):
@@ -61,7 +61,7 @@ Example (when running with default configuration):
 */
 
 /*
-Copyright (c) 2004-2008 by Scott Reilly (aka coffee2code)
+Copyright (c) 2004-2009 by Scott Reilly (aka coffee2code)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation 
 files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, 
@@ -83,6 +83,7 @@ class AutoHyperlinkURLs {
 	var $nonce_field = 'update-autohyperlink_urls';
 	var $show_admin = true;	// Change this to false if you don't want the plugin's admin page shown.
 	var $config = array();
+	var $options = array(); // Don't use this directly
 
 	function AutoHyperlinkURLs() {
 		add_action('admin_menu', array(&$this, 'admin_menu'));
@@ -122,49 +123,91 @@ class AutoHyperlinkURLs {
 	}
 	
 	function install() {
-		$options = $this->get_options();
-		update_option($this->admin_options_name, $options);
+		$this->options = $this->get_options();
+		update_option($this->admin_options_name, $this->options);
 	}
 
 	function admin_menu() {
-		if ($this->show_admin)
-			add_options_page('Auto-Hyperlink URLs', 'Autohyperlink', 9, basename(__FILE__), array(&$this, 'options_page'));
+		static $plugin_basename;
+		if ( $this->show_admin ) {
+			global $wp_version;
+			if ( current_user_can('manage_options') ) {
+				$plugin_basename = plugin_basename(__FILE__); 
+				if ( version_compare( $wp_version, '2.6.999', '>' ) )
+					add_filter( 'plugin_action_links_' . $plugin_basename, array(&$this, 'plugin_action_links') );
+				add_options_page('Auto-Hyperlink URLs', 'Autohyperlink', 9, $plugin_basename, array(&$this, 'options_page'));
+			}
+		}
+	}
+
+	function plugin_action_links($action_links) {
+		static $plugin_basename;
+		if ( !$plugin_basename ) $plugin_basename = plugin_basename(__FILE__); 
+		$settings_link = '<a href="options-general.php?page='.$plugin_basename.'">' . __('Settings') . '</a>';
+		array_unshift( $action_links, $settings_link );
+
+		return $action_links;
 	}
 
 	function get_options() {
+		if ( !empty($this->options) ) return $this->options;
 		// Derive options from the config
 		$options = array();
 		foreach (array_keys($this->config) as $opt) {
 			$options[$opt] = $this->config[$opt]['default'];
 		}
         $existing_options = get_option($this->admin_options_name);
-        if (!empty($existing_options)) {
+        if ( !empty($existing_options) ) {
             foreach ($existing_options as $key => $option)
                 $options[$key] = $option;
         }            
+		$this->options = $options;
         return $options;
 	}
 
 	function options_page() {
+		static $plugin_basename;
+		if ( !$plugin_basename ) $plugin_basename = plugin_basename(__FILE__); 
 		$options = $this->get_options();
 		// See if user has submitted form
 		if ( isset($_POST['submitted']) ) {
 			check_admin_referer($this->nonce_field);
 
 			foreach (array_keys($options) AS $opt) {
-				$options[$opt] = $_POST[$opt];
+				$options[$opt] = htmlspecialchars(stripslashes($_POST[$opt]));
+				$input = $this->config[$opt]['input'];
+				if (($input == 'checkbox') && !$options[$opt])
+					$options[$opt] = 0;
+				if ($this->config[$opt]['datatype'] == 'array') {
+					if ($input == 'text')
+						$options[$opt] = explode(',', str_replace(array(', ', ' ', ','), ',', $options[$opt]));
+					else
+						$options[$opt] = array_map('trim', explode("\n", trim($options[$opt])));
+				}
+				elseif ($this->config[$opt]['datatype'] == 'hash') {
+					if ( !empty($options[$opt]) ) {
+						$new_values = array();
+						foreach (explode("\n", $options[$opt]) AS $line) {
+							list($shortcut, $text) = array_map('trim', explode("=>", $line, 2));
+							if (!empty($shortcut)) $new_values[str_replace('\\', '', $shortcut)] = str_replace('\\', '', $text);
+						}
+						$options[$opt] = $new_values;
+					}
+				}
 			}
 			// Remember to put all the other options into the array or they'll get lost!
 			update_option($this->admin_options_name, $options);
 
-			echo "<div class='updated'><p>Plugin settings saved.</p></div>";
+			echo "<div id='message' class='updated fade'><p><strong>" . __('Settings saved') . '</strong></p></div>';
 		}
 
-		$action_url = $_SERVER[PHP_SELF] . '?page=' . basename(__FILE__);
+		$action_url = $_SERVER[PHP_SELF] . '?page=' . $plugin_basename;
+		$logo = plugins_url() . '/' . basename($_GET['page'], '.php') . '/c2c_minilogo.png';
 
 		echo <<<END
 		<div class='wrap'>
-			<h2>Auto-Hyperlink URLs Plugin Options</h2>
+			<div class='icon32' style='width:44px;'><img src='$logo' alt='A plugin by coffee2code' /><br /></div>
+			<h2>Auto-Hyperlink URLs Settings</h2>
 			<p>This plugin seeks to address certain shortcomings with WordPress's default auto-hyperlinking function.
 			This tweaks the pattern matching expressions to prevent inappropriate adjacent characters from becoming 
 			part of the link (such as a trailing period when a link ends a sentence, links that are parenthesized or 
@@ -183,16 +226,54 @@ END;
 		echo '<table width="100%" cellspacing="2" cellpadding="5" class="optiontable editform form-table">';
 				foreach (array_keys($options) as $opt) {
 					$input = $this->config[$opt]['input'];
+					if ($input == 'none') continue;
 					$label = $this->config[$opt]['label'];
 					$value = $options[$opt];
-					if (($input == 'checkbox') && ($value == 1)) {
-						$checked = 'checked=checked ';
+					if ($input == 'checkbox') {
+						$checked = ($value == 1) ? 'checked=checked ' : '';
 						$value = 1;
 					} else {
 						$checked = '';
 					};
-					echo "<tr valign='top'><th scope='row'>$label</th>";
-					echo "<td><input name='$opt' type='$input' id='$opt' value='$value' $checked/>";
+					if ($this->config[$opt]['datatype'] == 'array') {
+						if (!is_array($value))
+							$value = '';
+						else {
+							if ($input == 'textarea' || $input == 'inline_textarea')
+								$value = implode("\n", $value);
+							else
+								$value = implode(', ', $value);
+						}
+					} elseif ($this->config[$opt]['datatype'] == 'hash') {
+						if (!is_array($value))
+							$value = '';
+						else {
+							$new_value = '';
+							foreach ($value AS $shortcut => $replacement) {
+								$new_value .= "$shortcut => $replacement\n";
+							}
+							$value = $new_value;
+						}
+					}
+					echo "<tr valign='top'>";
+					if ($input == 'textarea') {
+						echo "<td colspan='2'>";
+						if ($label) echo "<strong>$label</strong><br />";
+						echo "<textarea name='$opt' id='$opt' {$this->config[$opt]['input_attributes']}>" . $value . '</textarea>';
+					} else {
+						echo "<th scope='row'>$label</th><td>";
+						if ($input == "inline_textarea")
+							echo "<textarea name='$opt' id='$opt' {$this->config[$opt]['input_attributes']}>" . $value . '</textarea>';
+						elseif ($input == 'select') {
+							echo "<select name='$opt' id='$opt'>";
+							foreach ($this->config[$opt]['options'] as $sopt) {
+								$selected = $value == $sopt ? " selected='selected'" : '';
+								echo "<option value='$sopt'$selected>$sopt</option>";
+							}
+							echo "</select>";
+						} else
+							echo "<input name='$opt' type='$input' id='$opt' value='$value' $checked {$this->config[$opt]['input_attributes']} />";
+					}
 					if ($this->config[$opt]['help']) {
 						echo "<br /><span style='color:#777; font-size:x-small;'>";
 						echo $this->config[$opt]['help'];
@@ -200,14 +281,15 @@ END;
 					}
 					echo "</td></tr>";
 				}
+		$txt = __('Save Changes');
 		echo <<<END
-			</table>
+			</tbody></table>
 			<input type="hidden" name="submitted" value="1" />
-			<div class="submit"><input type="submit" name="Submit" value="Save Changes" /></div>
+			<div class="submit"><input type="submit" name="Submit" class="button-primary" value="{$txt}" /></div>
 		</form>
 			</div>
 END;
-		$logo = get_option('siteurl') . '/wp-content/plugins/' . basename($_GET['page'], '.php') . '/c2c_minilogo.png';
+
 		echo <<<END
 		<style type="text/css">
 			#c2c {
@@ -267,43 +349,35 @@ END;
 	
 	function truncate_link($url) {
 		$options = $this->get_options();
-		$mode = $options['hyperlink_mode'];
-		$trunc_before = $options['truncation_before_text'];
-		$trunc_after = $options['truncation_after_text'];
-		$more_extensions = $options['more_extensions'];
-		return autohyperlink_truncate_link($url, $mode, $trunc_before, $trunc_after, $more_extensions);
+		return autohyperlink_truncate_link($url, $options['hyperlink_mode'],
+			$options['truncation_before_text'], $options['truncation_after_text'], $options['more_extensions']);
 	}
 
 	function hyperlink_urls($text) {
 		$options = $this->get_options();
-		$mode = $options['hyperlink_mode'];
-		$trunc_before = $options['truncation_before_text'];
-		$trunc_after = $options['truncation_after_text'];
-		$hyperlink_emails = $options['hyperlink_emails'];
-		$open_in_new_window = $options['open_in_new_window'];
-		$nofollow = $options['nofollow'];
-		$more_extensions = $options['more_extensions'];
-		return autohyperlink_link_urls($text, $mode, $trunc_before, $trunc_after, $hyperlink_emails, $open_in_new_window, $nofollow, $more_extensions);
+		return autohyperlink_link_urls($text, $options['hyperlink_mode'],
+			$options['truncation_before_text'], $options['truncation_after_text'], $options['hyperlink_emails'],
+			$options['open_in_new_window'], $options['nofollow'], $options['more_extensions']);
 	}
 } // end AutoHyperlinkURLs
 
 endif; // end if !class_exists()
+
 if ( class_exists('AutoHyperlinkURLs') ) :
-	// Get the ball rolling
 	$autohyperlink_urls = new AutoHyperlinkURLs();
 	// Actions and filters
-	if (isset($autohyperlink_urls)) {
+	if ( isset($autohyperlink_urls) ) {
 		register_activation_hook( __FILE__, array(&$autohyperlink_urls, 'install') );
 	}
 endif;
 
 function autohyperlink_truncate_link ($url, $mode=0, $trunc_before='', $trunc_after='...', $more_extensions='') {
-	if (1 == $mode) {
+	if ( 1 == $mode ) {
 		$url = preg_replace("/(([a-z]+?):\\/\\/[a-z0-9\-\.]+).*/i", "$1", $url);
-		if ($more_extensions)
+		if ( $more_extensions )
 		 	$more_extensions = '|' . implode('|', array_map('trim', explode('|', str_replace(array(', ', ' ', ','), '|', $more_extensions))));
 		$url = $trunc_before . preg_replace("/([a-z0-9\-\.]+\.(com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv$more_extensions)).*/i", "$1", $url) . $trunc_after;
-	} elseif (($mode > 10) && (strlen($url) > $mode)) {
+	} elseif ( ($mode > 10) && (strlen($url) > $mode) ) {
 		$url = $trunc_before . substr($url, 0, $mode) . $trunc_after;
 	}
 	return $url;
@@ -311,11 +385,11 @@ function autohyperlink_truncate_link ($url, $mode=0, $trunc_before='', $trunc_af
 
 function autohyperlink_link_urls ($text, $mode=0, $trunc_before='', $trunc_after='...', $hyperlink_emails=true, $open_in_new_window=true, $nofollow=false, $more_extensions='') {
 	$link_attributes = 'class="autohyperlink"';
-	if ($open_in_new_window) $link_attributes .= ' target="_blank"';
- 	if ($nofollow) $link_attributes .= ' rel="nofollow"';
+	if ( $open_in_new_window ) $link_attributes .= ' target="_blank"';
+ 	if ( $nofollow ) $link_attributes .= ' rel="nofollow"';
 	$text = ' ' . $text . ' ';
 	$extensions = 'com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv';
-	if ($more_extensions)
+	if ( $more_extensions )
 	 	$extensions .= '|' . implode('|', array_map('trim', explode('|', str_replace(array(', ', ' ', ','), '|', $more_extensions))));
 
 	$patterns = array(
@@ -328,7 +402,7 @@ function autohyperlink_link_urls ($text, $mode=0, $trunc_before='', $trunc_after
 		"'$1<a href=\"http://$2.$3$4\" title=\"http://$2.$3$4\" $link_attributes>' . autohyperlink_truncate_link(\"$2.$3$4\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'"
 	);
 	
-	if ($hyperlink_emails) {
+	if ( $hyperlink_emails ) {
 		$patterns[] = '#([\s{}\(\)\[\]])([a-z0-9\-_\.]+?)@([^\s,{}\(\)\[\]]+\.[^\s.,{}\(\)\[\]]+)#ie';
 		$replacements[] = "'$1<a class=\"autohyperlink\" href=\"mailto:$2@$3\" title=\"mailto:$2@$3\">' . autohyperlink_truncate_link(\"$2@$3\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'";
 	}
