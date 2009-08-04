@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Auto-hyperlink URLs
-Version: 3.1
+Version: 4.0
 Plugin URI: http://coffee2code.com/wp-plugins/autohyperlink-urls
 Author: Scott Reilly
 Author URI: http://coffee2code.com
@@ -89,17 +89,14 @@ class AutoHyperlinkURLs {
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_filter('the_content', array(&$this, 'hyperlink_urls'), 9);
 		
-		$options = $this->get_options();
-		if ($options['hyperlink_comments']) {
-			remove_filter('comment_text', array(&$this, 'make_clickable'));
-			add_filter('comment_text', array(&$this, 'hyperlink_urls'), 9);
-		}
-		
 		$this->config = array(
 			'hyperlink_comments' => array('input' => 'checkbox', 'default' => true,
 					'label' => 'Auto-hyperlink comments?'),
 			'hyperlink_emails' => array('input' => 'checkbox', 'default' => true, 
 					'label' => 'Hyperlink E-mails?'),
+			'strip_protocol' => array('input' => 'checkbox', 'default' => true, 
+					'label' => 'Strip protocol?',
+					'help' => 'Remove the protocol (i.e. \'http://\') from the displayed auto-hyperlinked link?'),
 			'open_in_new_window' => array('input' => 'checkbox', 'default' => true,
 					'label' => 'Open auto-hyperlinked links in new window?'),
 			'nofollow' => array('input' => 'checkbox', 'default' => false,
@@ -110,9 +107,9 @@ class AutoHyperlinkURLs {
 					'label' => 'Text to show after link truncation'),
 			'more_extensions' => array('input' => 'text', 'default' => '',
 					'label' => 'Extra domain extensions.',
-					'help' => 'Space and/or comma-separate list of extensions/<acronym title="Top-Level Domains">TLDs</acronym>.
+					'help' => 'Space and/or comma-separated list of extensions/<acronym title="Top-Level Domains">TLDs</acronym>.
 								<br />These are already built-in: com, org, net, gov, edu, mil, us, info, biz, ws, name, mobi, cc, tv'),
-			'hyperlink_mode' => array('input' => 'select', 'default' => 0,
+			'hyperlink_mode' => array('input' => 'shorttext', 'default' => 0,
 					'label' => 'Hyperlink Mode/Truncation',
 					'help' => 'This determines what text should appear as the link.  Use <code>0</code>
 								to show the full URL, use <code>1</code> to show just the hostname, or
@@ -120,6 +117,12 @@ class AutoHyperlinkURLs {
 								of the URL you want shown before it gets truncated.  <em>If</em> text
 								gets truncated, the truncation before/after text values above will be used.')
 		);
+
+		$options = $this->get_options();
+		if ( $options['hyperlink_comments'] ) {
+			remove_filter('comment_text', array(&$this, 'make_clickable'));
+			add_filter('comment_text', array(&$this, 'hyperlink_urls'), 9);
+		}
 	}
 	
 	function install() {
@@ -135,7 +138,7 @@ class AutoHyperlinkURLs {
 				$plugin_basename = plugin_basename(__FILE__); 
 				if ( version_compare( $wp_version, '2.6.999', '>' ) )
 					add_filter( 'plugin_action_links_' . $plugin_basename, array(&$this, 'plugin_action_links') );
-				add_options_page('Auto-Hyperlink URLs', 'Autohyperlink', 9, $plugin_basename, array(&$this, 'options_page'));
+				add_options_page('Auto-Hyperlink URLs', 'Auto-hyperlink', 9, $plugin_basename, array(&$this, 'options_page'));
 			}
 		}
 	}
@@ -346,18 +349,86 @@ END;
 			</div>
 END;
 	}
-	
-	function truncate_link($url) {
-		$options = $this->get_options();
-		return autohyperlink_truncate_link($url, $options['hyperlink_mode'],
-			$options['truncation_before_text'], $options['truncation_after_text'], $options['more_extensions']);
+
+	function get_class() {
+		return attribute_escape(apply_filters('autohyperlink_urls_class', 'autohyperlink'));
 	}
 
-	function hyperlink_urls($text) {
+	function get_link_attributes( $title = '' ) {
+		$link_attributes = 'class="' . $this->get_class() . '"';
+		if ( $title ) $link_attributes .= ' title="' . attribute_escape($title) . '"';
+		if ( $options['open_in_new_window'] ) $link_attributes .= ' target="_blank"';
+	 	if ( $options['nofollow'] ) $link_attributes .= ' rel="nofollow"';
+		return apply_filters('autohyperlink_urls_link_attributes', $link_attributes);
+	}
+
+	function get_tlds() {
+		static $tlds;
+		if ( !$tlds ) {
+			$options = $this->get_options();
+			$tlds = 'com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv';
+			if ( $options['more_extensions'] )
+			 	$tlds .= '|' . implode('|', array_map('trim', explode('|', str_replace(array(', ', ' ', ','), '|', $options['more_extensions']))));
+		}
+		return apply_filters('autohyperlink_urls_tlds', $tlds);
+	}
+
+	function truncate_link( $url ) {
 		$options = $this->get_options();
-		return autohyperlink_link_urls($text, $options['hyperlink_mode'],
-			$options['truncation_before_text'], $options['truncation_after_text'], $options['hyperlink_emails'],
-			$options['open_in_new_window'], $options['nofollow'], $options['more_extensions']);
+		$mode = intval($options['hyperlink_mode']);
+		$more_extensions = $options['more_extensions'];
+		$trunc_before = $options['truncation_before_text'];
+		$trunc_after = $options['truncation_after_text'];
+		$original_url = $url;
+		if ( 1 === $mode ) {
+			$url = preg_replace("/(([a-z]+?):\\/\\/[a-z0-9\-\:@]+).*/i", "$1", $url);
+			$extensions = $this->get_tlds();
+			$url = $trunc_before . preg_replace("/([a-z0-9\-\:@]+\.($extensions)).*/i", "$1", $url) . $trunc_after;
+		} elseif ( ($mode > 10) && (strlen($url) > $mode) ) {
+			$url = $trunc_before . substr($url, 0, $mode) . $trunc_after;
+		}
+		return apply_filters('autohyperlink_urls_truncate_link', $original_url, $url);
+	}
+
+	function hyperlink_urls( $text ) {
+		$options = $this->get_options();
+		$text = ' ' . $text . ' ';
+		$extensions = $this->get_tlds();
+
+		$text = preg_replace_callback("#([\s{}\(\)\[\]>])([a-z0-9\-\.]+[a-z0-9\-])\.($extensions)((?:/[^\s<{}\(\)\[\]]*[^\.,\s<{}\(\)\[\]]?)?)#is",
+							array(&$this, 'do_hyperlink_url_no_proto'), $text);
+//		$text = preg_replace_callback('#([\s{}\(\)\[\]>])(([a-z]+?)://([a-z_0-9\-\:@]+\.([^\s<{}\(\)\[\]\<]+[^\s<,\.\;{}\(\)\[\]])))#i',
+//							array(&$this, 'do_hyperlink_url'), $text);
+		$text = preg_replace_callback('#(?<=[\s>])(\()?(([\w]+?)://((?:[\w\\x80-\\xff\#$%&~/\-=?@\[\](+]|[.,;:](?![\s<])|(?(1)\)(?![\s<])|\)))+))#is',
+							array(&$this, 'do_hyperlink_url'), $text);
+
+		if ( $options['hyperlink_emails'] )
+			$text = preg_replace_callback('#([\s>])([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})#i', 
+							array(&$this, 'do_hyperlink_email'), $text);
+//			$text = preg_replace_callback('#([\s{}\(\)\[\]>])([a-z0-9\-_\.]+?)@([^\s,<{}\(\)\[\]]+\.[^\s.,<{}\(\)\[\]]+)#i', 
+//							array(&$this, 'do_hyperlink_email'), $text);
+
+		// Remove links within links
+ 		$text = preg_replace("#(<a [^>]+[\"'][^>\"']+)<a [^>]+>([^>]+?)</a>(.+)</a>#isU", "$1$3$4</a>", $text);
+		$text = preg_replace("#(<a( [^>]+?>|>))<a [^>]+?>([^>]+?)</a></a>#i", "$1$3</a>", $text);
+
+		return trim($text);
+	}
+
+	function do_hyperlink_url( $matches ) {
+		$options = $this->get_options();
+		$link_text = $options['strip_protocol'] ? $matches[4] : $matches[2];
+		return $matches[1] . "<a href=\"$matches[2]\" " . $this->get_link_attributes($matches[2]) .'>' . $this->truncate_link($link_text) . '</a>';
+	}
+
+	function do_hyperlink_url_no_proto( $matches ) {
+		$dest = $matches[2] . '.' . $matches[3] . $matches[4];
+		return $matches[1] . "<a href=\"http://$dest\" " . $this->get_link_attributes("http://$dest") .'>' . $this->truncate_link($dest) . '</a>';
+	}
+
+	function do_hyperlink_email( $matches ) {
+		$email = $matches[2] . '@' . $matches[3];
+		return $matches[1] . "<a class=\"" . $this->get_class() . "\" href=\"mailto:$email\" title=\"mailto:$email\">" . $this->truncate_link($email) . '</a>';
 	}
 } // end AutoHyperlinkURLs
 
@@ -371,48 +442,18 @@ if ( class_exists('AutoHyperlinkURLs') ) :
 	}
 endif;
 
-function autohyperlink_truncate_link ($url, $mode=0, $trunc_before='', $trunc_after='...', $more_extensions='') {
-	if ( 1 == $mode ) {
-		$url = preg_replace("/(([a-z]+?):\\/\\/[a-z0-9\-\.]+).*/i", "$1", $url);
-		if ( $more_extensions )
-		 	$more_extensions = '|' . implode('|', array_map('trim', explode('|', str_replace(array(', ', ' ', ','), '|', $more_extensions))));
-		$url = $trunc_before . preg_replace("/([a-z0-9\-\.]+\.(com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv$more_extensions)).*/i", "$1", $url) . $trunc_after;
-	} elseif ( ($mode > 10) && (strlen($url) > $mode) ) {
-		$url = $trunc_before . substr($url, 0, $mode) . $trunc_after;
-	}
-	return $url;
+/*
+ * TEMPLATE TAGS
+ */
+
+function autohyperlink_truncate_link( $url ) {
+	global $autohyperlink_urls;
+	return $autohyperlink_urls->truncate_link($url);
 }
 
-function autohyperlink_link_urls ($text, $mode=0, $trunc_before='', $trunc_after='...', $hyperlink_emails=true, $open_in_new_window=true, $nofollow=false, $more_extensions='') {
-	$link_attributes = 'class="autohyperlink"';
-	if ( $open_in_new_window ) $link_attributes .= ' target="_blank"';
- 	if ( $nofollow ) $link_attributes .= ' rel="nofollow"';
-	$text = ' ' . $text . ' ';
-	$extensions = 'com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv';
-	if ( $more_extensions )
-	 	$extensions .= '|' . implode('|', array_map('trim', explode('|', str_replace(array(', ', ' ', ','), '|', $more_extensions))));
-
-	$patterns = array(
-		'#([\s{}\(\)\[\]])(([a-z]+?)://([a-z_0-9\-]+\.([^\s{}\(\)\[\]]+[^\s,\.\;{}\(\)\[\]])))#ie',
-		"#([\s{}\(\)\[\]])([a-z0-9\-\.]+[a-z0-9\-])\.($extensions)((?:/[^\s{}\(\)\[\]]*[^\.,\s{}\(\)\[\]]?)?)#ie"
-	);
-
-	$replacements = array(
-		"'$1<a href=\"$2\" title=\"$2\" $link_attributes>' . autohyperlink_truncate_link(\"$4\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'",
-		"'$1<a href=\"http://$2.$3$4\" title=\"http://$2.$3$4\" $link_attributes>' . autohyperlink_truncate_link(\"$2.$3$4\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'"
-	);
-	
-	if ( $hyperlink_emails ) {
-		$patterns[] = '#([\s{}\(\)\[\]])([a-z0-9\-_\.]+?)@([^\s,{}\(\)\[\]]+\.[^\s.,{}\(\)\[\]]+)#ie';
-		$replacements[] = "'$1<a class=\"autohyperlink\" href=\"mailto:$2@$3\" title=\"mailto:$2@$3\">' . autohyperlink_truncate_link(\"$2@$3\", \"$mode\", \"$trunc_before\", \"$trunc_after\") . '</a>'";
-	}
-	
-	$text = preg_replace($patterns, $replacements, $text);
-
-	// Remove links within links
-	$text = preg_replace("#(<a( [^>]+?>|>))<a [^>]+?>([^>]+?)</a></a>#i", "$1$3</a>", $text);
-
-	return trim($text);
+function autohyperlink_link_urls( $text ) {
+	global $autohyperlink_urls;
+	return $autohyperlink_urls->hyperlink_urls($text);
 }
 
 ?>
