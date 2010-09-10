@@ -1,28 +1,29 @@
 === Auto-hyperlink URLs ===
 Contributors: coffee2code
 Donate link: http://coffee2code.com
-Tags: links, URLs, auto-link 
-Requires at least: 2.0.2
-Tested up to: 2.5
-Stable tag: trunk
-Version: 3.0
+Tags: links, link, URLs, url, auto-link, hyperlink, coffee2code
+Requires at least: 2.6
+Tested up to: 2.8.4
+Stable tag: 3.5
+Version: 3.5
 
-Automatically hyperlink text URLs and email addresses that appear in plaintext in post content and comments.
+Automatically hyperlink text URLs and email addresses originally written only as plaintext.
 
 == Description ==
 
-Automatically hyperlink text URLs and email addresses that appear in plaintext in post content and comments.
+Automatically hyperlink text URLs and email addresses originally written only as plaintext.
 
-This plugin seeks to address certain shortcomings with WordPress's default auto-hyperlinking function.  This tweaks the pattern matching expressions to prevent inappropriate adjacent characters from becoming part of the link (such as a trailing period when a link ends a sentence, links that are parenthesized or braced, comma-separated, etc) and it prevents invalid text from becoming a mailto: link (i.e. smart@ss) or for invalid URIs (i.e. http://blah) from becoming links.  In addition, this plugin adds configurability to the auto-hyperlinker such that you can configure:
+This plugin seeks to replace and extend WordPress's default auto-hyperlinking function.  This plugin tweaks the pattern matching expressions to prevent inappropriate adjacent characters from becoming part of the link (such as a trailing period when a link ends a sentence, links that are parenthesized or braced, comma-separated, etc) and it prevents invalid text from becoming a mailto: link (i.e. smart@ss) or for invalid URIs (i.e. http://blah) from becoming links.  In addition, this plugin adds configurability to the auto-hyperlinker such that you can configure:
 
 * If you want text URLs to only show the hostname
 * If you want text URLs truncated after N characters
 * If you want auto-hyperlinked URLs to open in new browser window or not
+* If you want the protocol (i.e. "http://") to be stripped for displayed links
 * The text to come before and after the link text for truncated links
-* If you want nofollow to be supported
+* If you want rel="nofollow" to be supported
 * If you wish to support additional domain extensions not already configured into the plugin
 
-This plugin will recognize any protocol-specified URI (http|https|ftp|news)://, etc, as well as e-mail addresses.  It also adds the new ability to recognize Class B domain references (i.e. "somesite.net", not just domains prepended with "www.") as valid links (i.e. "wordpress.org" would now get auto-hyperlinked)
+This plugin will recognize any protocol-specified URI (http|https|ftp|news)://, etc, as well as e-mail addresses.  It also adds the new ability to recognize Class B domain references (i.e. "somesite.net", not just domains prepended with "www.") as valid links (i.e. "wordpress.org" would get auto-hyperlinked)
 
 The following domain extensions (aka TLDs, Top-Level Domains) are recognized by the plugin: com, org, net, gov, edu, mil, us, info, biz, ws, name, mobi, cc, tv.  Knowing these only comes into play when you have a plaintext URL that does not have an explicit protocol specified.  If you need support for additional TLDs, you can add more via the plugin's admin options page.
 
@@ -30,7 +31,8 @@ The following domain extensions (aka TLDs, Top-Level Domains) are recognized by 
 
 1. Unzip `autohyperlink-urls.zip` inside the `/wp-content/plugins/` directory, or upload `autohyperlink-urls.php` to `/wp-content/plugins/`
 1. Activate the plugin through the 'Plugins' admin menu in WordPress
-1. (optional) Modify any configuration options for the plugin by going to its admin configuration page at `Options` -> `Autohyperlink` (or in WP 2.5: `Settings` -> `Autohyperlink`)
+1. (optional) Go to the Settings -> Autohyperlink admin settings page (which you can also get to via the Settings link next to the plugin on
+the Manage Plugins page) and customize the settings.
 
 == Examples ==
 
@@ -75,3 +77,79 @@ comes out as:
 == Screenshots ==
 
 1. A screenshot of the plugin's admin options page.
+
+== Changelog ==
+
+= 3.5 (unreleased) =
+* NEW:
+* Extracted functionality into clearly defined, single-tasked, and filterable functions
+* Added get_class() with filter 'autohyperlink_urls_class' to filter class assigned to auto-hyperlinks (default is 'autohyperlink')
+* Added get_link_attributes() with filter 'autohyperlink_urls_link_attributes' to filter all attributes for auto-hyperlink
+* Added get_tlds() with filter 'autohyperlink_urls_tlds' to filter TLDs recognized by the plugin (a '|' separated string of tlds)
+* Added filter 'autohyperlink_urls_truncate_link' to truncate_link() to facilitate customized link truncation
+* Added strip_protocol setting to control if protocol should be stripped from auto-hyperlinks
+* Added 'Settings' link to plugin's plugin listing entry
+* Added Changelog to readme.txt
+* CHANGED:
+* Moved all global functions into class (except autohyperlink_truncate_link() and autohyperlink_link_urls(), which are now just single argument proxies to classed versions)
+* Rewrote significant portions of all regular expressions
+* Added hyphen to settings link text
+* truncate_link() and hyperlink_urls() now pass arguments inline instead of setting temporary variables
+* Memoized options in class
+* Added class variable 'plugin_basename', which gets initialized in constructor, and use it instead of hardcoded path
+* Updated to current admin page markup conventions
+* Improved options handling
+* Added logo to settings page
+* Minor reformatting
+* Noted compatibility through WP2.8+
+* Dropped support for versions of WP older than 2.6
+* Changed description
+* Updated copyright date
+* Updated screenshot
+* FIXED:
+* Changed pattern matching code for email addresses to allow for emails to be preceded by non-space characters
+* Changed pattern matching code for all auto-hyperlinking to better prevent linking a link within tag attributes
+* Used plugins_url() instead of hardcoded path
+
+= 3.0 =
+* Overhauled and added a bunch of new code
+* Encapsulated a majority of functionality in a class
+* Added admin options page for the plugin, under Options -> Autohyperlink (or in WP 2.5: Settings -> Autohyperlink)
+* Added options so that default auto-hyperlinking can be easily configured
+* Added option to allow for user-specified TLDs
+* Added TLDs of mil, mobi, and cc
+* Added option to conditionally auto-hyperlink comments
+* Renamed existing functions
+* "~" is a valid URL character
+* Added class of "autohyperlink" to all links created by the plugin
+* Removed the A-Z from regexp since they are case-insensitive
+* Recoded some of the core functionality so as to execute only one preg_replace() call for everything (by passing patterns and replacements as arrays)
+* Added a note about the known issue of the plugin linking URLs that appear within a longer string in a tag attribute's value
+* trim() text before return instead of doing a substr()
+* Added nofollow support
+* Moved Class B domain preg to after explicitly protocoled links
+* Tweaked description and installation instructions
+* Updated copyright date and version to 3.0
+* Added readme.txt and screenshot image to distribution zip
+* Tested compatibility with WP 2.3+ and 2.5
+
+= 2.01 =
+* Fix to once again prevent linking already hyperlinked URL
+
+= 2.0 =
+* Plaintext URLs can now begin, end, or be all of the post and it will get auto-hyperlinked
+* Incorporated some WP1.3 regular expression changes to make_clickable()
+* Added “gov” and “edu” to the list of common domain extensions (for Class B domain support)
+* No longer displays the protocol (the “http://” part) in the displayed link text
+* Dropped support for auto-linking aim: and icq:
+* Prepended function names with “c2c_”to avoid potential future conflict with other plugins or the WordPress core
+* Changed license from BSD-new to MIT
+
+= 1.01 =
+* Slight tweak to prevent http://blah from becoming a link
+
+= 1.0 =
+* Complete rewrite
+
+= 0.9 =
+* Initial release

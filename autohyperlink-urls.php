@@ -1,50 +1,46 @@
 <?php
 /*
 Plugin Name: Auto-hyperlink URLs
-Version: 4.0
+Version: 3.5
 Plugin URI: http://coffee2code.com/wp-plugins/autohyperlink-urls
 Author: Scott Reilly
 Author URI: http://coffee2code.com
-Description: Automatically hyperlink text URLs and email addresses that appear in plaintext in post content and comments.
+Description: Automatically hyperlink text URLs and email addresses originally written only as plaintext.
 
-This plugin seeks to address certain shortcomings with WordPress's default auto-hyperlinking function.  This tweaks the 
+This plugin seeks to replace and extend WordPress's default auto-hyperlinking function.  This plugin tweaks the
 pattern matching expressions to prevent inappropriate adjacent characters from becoming part of the link (such as a 
 trailing period when a link ends a sentence, links that are parenthesized or braced, comma-separated, etc) and it prevents
 invalid text from becoming a mailto: link (i.e. smart@ss) or for invalid URIs (i.e. http://blah) from becoming links.  In 
 addition, this plugin adds configurability to the auto-hyperlinker such that you can configure:
 
-- If you want text URLs to only show the hostname
-- If you want text URLs truncated after N characters
-- If you want auto-hyperlinked URLs to open in new browser window or not
-- The text to come before and after the link text for truncated links
-- If you want nofollow to be supported
-- If you wish to support additional domain extensions not already configured into the plugin
+* If text URLs should only show the hostname
+* If text URLs should be truncated after N characters
+* If auto-hyperlinked URLs should open in new browser window or not
+* If the protocol (i.e. "http://") should to be stripped for displayed links
+* The text to come before and after the link text for truncated links
+* If rel="nofollow" should be supported
+* If there should be support additional domain extensions not already configured into the plugin
 
 This plugin will recognize any protocol-specified URI (http|https|ftp|news)://, etc, as well as e-mail addresses.  
 It also adds the new ability to recognize Class B domain references (i.e. "somesite.net", not just domains prepended 
 with "www.") as valid links (i.e. "wordpress.org" would now get auto-hyperlinked)
 
-Known issues:
-	Currently the plugin hyperlinks URLs that appear embedded within the middle of a longer string used as tag attribute value.
-	i.e. 
-	<a href="http://example.com" title="I go to http://example.com often">example.com</a>
-	comes out as:
-	<a href="http://example.com" title="I go to <a href="http://example.com" class="autohyperlink">http://example.com</a> often">example.com</a>
-	
-	It will also not hyperlink URLs that are immediately single- or double-quoted, i.e. 'http://example.com' or "http://example.com"
+Known issue:
+* It will not hyperlink URLs that are immediately single- or double-quoted, i.e. 'http://example.com' or "http://example.com"
 	
 Compatible with WordPress 2.6+, 2.7+, 2.8+.
 
 =>> Read the accompanying readme.txt file for more information.  Also, visit the plugin's homepage
 =>> for more information and the latest updates
 
+
 Installation:
 
 1. Download the file http://coffee2code.com/wp-plugins/autohyperlink-urls.zip and unzip it into your 
 /wp-content/plugins/ directory.
 2. Activate the plugin through the 'Plugins' admin menu in WordPress
-3. (optional) Modify any configuration options for the plugin by going to its admin configuration page at
-Settings -> Autohyperlink
+3. (optional) Go to the Settings -> Autohyperlink admin settings page (which you can also get to via the Settings link next to
+the plugin on the Manage Plugins page) and customize the settings.
 
 
 Example (when running with default configuration):
@@ -84,8 +80,10 @@ class AutoHyperlinkURLs {
 	var $show_admin = true;	// Change this to false if you don't want the plugin's admin page shown.
 	var $config = array();
 	var $options = array(); // Don't use this directly
+	var $plugin_basename = '';
 
 	function AutoHyperlinkURLs() {
+		$this->plugin_basename = plugin_basename(__FILE__);
 		add_action('admin_menu', array(&$this, 'admin_menu'));
 		add_filter('the_content', array(&$this, 'hyperlink_urls'), 9);
 		
@@ -93,7 +91,7 @@ class AutoHyperlinkURLs {
 			'hyperlink_comments' => array('input' => 'checkbox', 'default' => true,
 					'label' => 'Auto-hyperlink comments?'),
 			'hyperlink_emails' => array('input' => 'checkbox', 'default' => true, 
-					'label' => 'Hyperlink E-mails?'),
+					'label' => 'Hyperlink email addresses?'),
 			'strip_protocol' => array('input' => 'checkbox', 'default' => true, 
 					'label' => 'Strip protocol?',
 					'help' => 'Remove the protocol (i.e. \'http://\') from the displayed auto-hyperlinked link?'),
@@ -131,22 +129,18 @@ class AutoHyperlinkURLs {
 	}
 
 	function admin_menu() {
-		static $plugin_basename;
 		if ( $this->show_admin ) {
 			global $wp_version;
 			if ( current_user_can('manage_options') ) {
-				$plugin_basename = plugin_basename(__FILE__); 
 				if ( version_compare( $wp_version, '2.6.999', '>' ) )
-					add_filter( 'plugin_action_links_' . $plugin_basename, array(&$this, 'plugin_action_links') );
-				add_options_page('Auto-Hyperlink URLs', 'Auto-hyperlink', 9, $plugin_basename, array(&$this, 'options_page'));
+					add_filter( 'plugin_action_links_' . $this->plugin_basename, array(&$this, 'plugin_action_links') );
+				add_options_page('Auto-Hyperlink URLs', 'Auto-hyperlink', 9, $this->plugin_basename, array(&$this, 'options_page'));
 			}
 		}
 	}
 
 	function plugin_action_links($action_links) {
-		static $plugin_basename;
-		if ( !$plugin_basename ) $plugin_basename = plugin_basename(__FILE__); 
-		$settings_link = '<a href="options-general.php?page='.$plugin_basename.'">' . __('Settings') . '</a>';
+		$settings_link = '<a href="options-general.php?page='.$this->plugin_basename.'">' . __('Settings') . '</a>';
 		array_unshift( $action_links, $settings_link );
 
 		return $action_links;
@@ -169,8 +163,6 @@ class AutoHyperlinkURLs {
 	}
 
 	function options_page() {
-		static $plugin_basename;
-		if ( !$plugin_basename ) $plugin_basename = plugin_basename(__FILE__); 
 		$options = $this->get_options();
 		// See if user has submitted form
 		if ( isset($_POST['submitted']) ) {
@@ -201,10 +193,10 @@ class AutoHyperlinkURLs {
 			// Remember to put all the other options into the array or they'll get lost!
 			update_option($this->admin_options_name, $options);
 
-			echo "<div id='message' class='updated fade'><p><strong>" . __('Settings saved') . '</strong></p></div>';
+			echo "<div id='message' class='updated fade'><p><strong>" . __('Settings saved.') . '</strong></p></div>';
 		}
 
-		$action_url = $_SERVER[PHP_SELF] . '?page=' . $plugin_basename;
+		$action_url = $_SERVER[PHP_SELF] . '?page=' . $this->plugin_basename;
 		$logo = plugins_url() . '/' . basename($_GET['page'], '.php') . '/c2c_minilogo.png';
 
 		echo <<<END
@@ -395,23 +387,24 @@ END;
 		$text = ' ' . $text . ' ';
 		$extensions = $this->get_tlds();
 
-		$text = preg_replace_callback("#([\s{}\(\)\[\]>])([a-z0-9\-\.]+[a-z0-9\-])\.($extensions)((?:/[^\s<{}\(\)\[\]]*[^\.,\s<{}\(\)\[\]]?)?)#is",
+		$text = preg_replace_callback("#(?!<.*?)([\s{}\(\)\[\]>])([a-z0-9\-\.]+[a-z0-9\-])\.($extensions)((?:[/\#?][^\s<{}\(\)\[\]]*[^\.,\s<{}\(\)\[\]]?)?)(?![^<>]*?>)#is",
 							array(&$this, 'do_hyperlink_url_no_proto'), $text);
-//		$text = preg_replace_callback('#([\s{}\(\)\[\]>])(([a-z]+?)://([a-z_0-9\-\:@]+\.([^\s<{}\(\)\[\]\<]+[^\s<,\.\;{}\(\)\[\]])))#i',
-//							array(&$this, 'do_hyperlink_url'), $text);
-		$text = preg_replace_callback('#(?<=[\s>])(\()?(([\w]+?)://((?:[\w\\x80-\\xff\#$%&~/\-=?@\[\](+]|[.,;:](?![\s<])|(?(1)\)(?![\s<])|\)))+))#is',
+		$text = preg_replace_callback('#(?!<.*?)(?<=[\s>])(\()?(([\w]+?)://((?:[\w\\x80-\\xff\#$%&~/\-=?@\[\](+]|[.,;:](?![\s<])|(?(1)\)(?![\s<])|\)))+))(?![^<>]*?>)#is',
 							array(&$this, 'do_hyperlink_url'), $text);
-
+/*		$text = preg_replace_callback('#(?!<.*?)(?<=[\s>])(\()?(([\w]+?)://((?:[\w\\x80-\\xff\#$%&~/\-=?@\[\](+]|[.,;:](?![\s<])|(?(1)\)(?![\s<])|\)))+))(?![^<>]*?>)#is',
+							array(&$this, 'do_hyperlink_url'), $text);
+*/
 		if ( $options['hyperlink_emails'] )
-			$text = preg_replace_callback('#([\s>])([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})#i', 
+			$text = preg_replace_callback('#(?!<.*?)([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})(?![^<>]*?>)#i',
 							array(&$this, 'do_hyperlink_email'), $text);
-//			$text = preg_replace_callback('#([\s{}\(\)\[\]>])([a-z0-9\-_\.]+?)@([^\s,<{}\(\)\[\]]+\.[^\s.,<{}\(\)\[\]]+)#i', 
-//							array(&$this, 'do_hyperlink_email'), $text);
 
 		// Remove links within links
+/*
  		$text = preg_replace("#(<a [^>]+[\"'][^>\"']+)<a [^>]+>([^>]+?)</a>(.+)</a>#isU", "$1$3$4</a>", $text);
 		$text = preg_replace("#(<a( [^>]+?>|>))<a [^>]+?>([^>]+?)</a></a>#i", "$1$3</a>", $text);
-
+*/
+$text = preg_replace("#(<a [^>]+>)(.*)<a [^>]+>([^<]*)</a>([^>]*)</a>#iU", "$1$2$3$4</a>" , $text);
+//$text = preg_replace("#(<a [^>]+>)(.*)<a [^>]+>((?!</a>)*)</a>((?!</a>)*)</a>#iU", "$1$2$3$4</a>" , $text);
 		return trim($text);
 	}
 
@@ -427,8 +420,8 @@ END;
 	}
 
 	function do_hyperlink_email( $matches ) {
-		$email = $matches[2] . '@' . $matches[3];
-		return $matches[1] . "<a class=\"" . $this->get_class() . "\" href=\"mailto:$email\" title=\"mailto:$email\">" . $this->truncate_link($email) . '</a>';
+		$email = $matches[1] . '@' . $matches[2];
+		return "<a class=\"" . $this->get_class() . "\" href=\"mailto:$email\" title=\"mailto:$email\">" . $this->truncate_link($email) . '</a>';
 	}
 } // end AutoHyperlinkURLs
 
@@ -436,10 +429,8 @@ endif; // end if !class_exists()
 
 if ( class_exists('AutoHyperlinkURLs') ) :
 	$autohyperlink_urls = new AutoHyperlinkURLs();
-	// Actions and filters
-	if ( isset($autohyperlink_urls) ) {
+	if ( isset($autohyperlink_urls) )
 		register_activation_hook( __FILE__, array(&$autohyperlink_urls, 'install') );
-	}
 endif;
 
 /*
