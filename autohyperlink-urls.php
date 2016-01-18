@@ -183,7 +183,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
 		}
 
 		if ( $options['hyperlink_comments'] ) {
-			remove_filter( 'comment_text', array( $this, 'make_clickable' ) );
+			remove_filter( 'comment_text', 'make_clickable', 9 );
 			add_filter( 'comment_text', array( $this, 'hyperlink_urls' ), 9 );
 		}
 	}
