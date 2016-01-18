@@ -20,6 +20,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		remove_filter( 'autohyperlink_urls_link_attributes',   array( $this, 'autohyperlink_urls_link_attributes' ) );
 		remove_filter( 'autohyperlink_urls_tlds',              array( $this, 'autohyperlink_urls_tlds' ) );
 		remove_filter( 'autohyperlink_urls_exclude_domains',   array( $this, 'autohyperlink_urls_exclude_domains' ) );
+		remove_filter( 'autohyperlink_urls_custom_exclusions', array( $this, 'autohyperlink_urls_custom_exclusions' ), 10, 3 );
 	}
 
 
@@ -120,6 +121,10 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function autohyperlink_urls_exclude_domains( $exclusions ) {
 		$exclusions[] = 'example.com';
 		return $exclusions;
+	}
+
+	public function autohyperlink_urls_custom_exclusions( $allow, $url, $domain ) {
+		return ! ( 'e' ===  $domain[0] );
 	}
 
 	//
@@ -633,6 +638,27 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		foreach ( $texts as $text ) {
 			$this->assertEquals(
 				$text,
+				c2c_autohyperlink_link_urls( $text )
+			);
+		}
+	}
+
+	public function test_filter_autohyperlink_urls_custom_exclusions_recognizes_true() {
+		add_filter( 'autohyperlink_urls_custom_exclusions', array( $this, 'autohyperlink_urls_custom_exclusions' ), 10, 3 );
+
+		$before = array(
+			'Visit coffee2code.com soon.',
+			'Visit http://coffee2code.com soon.',
+		);
+
+		$expected = array(
+			'Visit <a href="http://coffee2code.com" class="autohyperlink" title="http://coffee2code.com" target="_blank">coffee2code.com</a> soon.',
+			'Visit <a href="http://coffee2code.com" class="autohyperlink" title="http://coffee2code.com" target="_blank">coffee2code.com</a> soon.',
+		);
+
+		foreach ( $before as $key => $text ) {
+			$this->assertEquals(
+				$expected[ $key ],
 				c2c_autohyperlink_link_urls( $text )
 			);
 		}
