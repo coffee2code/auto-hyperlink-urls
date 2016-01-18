@@ -132,7 +132,8 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
 
 		$this->config = array(
 			'hyperlink_comments' => array( 'input' => 'checkbox', 'default' => true,
-				'label' => __( 'Auto-hyperlink comments?', 'auto-hyperlink-urls' )
+				'label' => __( 'Auto-hyperlink comments?', 'auto-hyperlink-urls' ),
+				'help'  => __( 'Note that if disabled WordPress\'s built-in hyperlinking function will still be performed, which links email addresses and text URLs with explicit protocols.', 'auto-hyperlink-urls' ),
 			),
 			'hyperlink_emails' => array( 'input' => 'checkbox', 'default' => true,
 				'label' => __( 'Hyperlink email addresses?', 'auto-hyperlink-urls' )
