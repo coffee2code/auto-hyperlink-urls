@@ -16,9 +16,10 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		c2c_AutoHyperlinkURLs::get_instance()->reset_options();
 
 		// Remove hooks.
-		remove_filter( 'autohyperlink_urls_class',           array( $this, 'autohyperlink_urls_class' ) );
-		remove_filter( 'autohyperlink_urls_link_attributes', array( $this, 'autohyperlink_urls_link_attributes' ) );
-		remove_filter( 'autohyperlink_urls_tlds',            array( $this, 'autohyperlink_urls_tlds' ) );
+		remove_filter( 'autohyperlink_urls_class',             array( $this, 'autohyperlink_urls_class' ) );
+		remove_filter( 'autohyperlink_urls_link_attributes',   array( $this, 'autohyperlink_urls_link_attributes' ) );
+		remove_filter( 'autohyperlink_urls_tlds',              array( $this, 'autohyperlink_urls_tlds' ) );
+		remove_filter( 'autohyperlink_urls_exclude_domains',   array( $this, 'autohyperlink_urls_exclude_domains' ) );
 	}
 
 
@@ -116,6 +117,10 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		return $tlds . 'dev|co|io';
 	}
 
+	public function autohyperlink_urls_exclude_domains( $exclusions ) {
+		$exclusions[] = 'example.com';
+		return $exclusions;
+	}
 
 	//
 	//
@@ -191,6 +196,13 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_default_value_of_more_extensions() {
 		$options = c2c_AutoHyperlinkURLs::get_instance()->get_options();
 		$this->assertEmpty( $options['more_extensions'] );
+	}
+
+	public function test_default_value_of_exclude_domains() {
+		$options = c2c_AutoHyperlinkURLs::get_instance()->get_options();
+		$this->assertEmpty( $options['exclude_domains'] );
+		var_dump($options['exclude_domains']);
+		$this->assertTrue( is_array( $options['exclude_domains'] ) );
 	}
 
 	/*
@@ -544,6 +556,21 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	/*
+	 * Setting: exclude_domains
+	 */
+
+	public function test_exclude_domains() {
+		$this->set_option( array( 'exclude_domains' => array( 'example.com') ) );
+
+		$text = 'example.com';
+
+		$this->assertEquals(
+			$text,
+			c2c_autohyperlink_link_urls( $text )
+		);
+	}
+
+	/*
 	 * Filters
 	 */
 
@@ -584,37 +611,32 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
-/*
-		//
-		// Test non-standard settings usage
-		//
+	public function test_filter_autohyperlink_urls_exclude_domains() {
+		add_filter( 'autohyperlink_urls_exclude_domains', array( $this, 'autohyperlink_urls_exclude_domains' ) );
 
-		// Test no support for unrecognized TLD
-		$tld = 'zzz';
-		$res = c2c_autohyperlink_link_urls( "coffee2code.$tld", $default );
-		$result = $res == "coffee2code.$tld" ? 'PASS' : "FAIL ($tld)";
-		echo "<li>Test #$i: $result</li>\n";
-		$i++;
+		$text = 'Visit example.com soon.';
 
-		// Test hyperlink mode 1
-		$res = c2c_autohyperlink_link_urls( 'coffee2code.com/some/page', wp_parse_args( array( 'hyperlink_mode' => 1 ), $default ) );
-		$expect = str_replace( '"http://coffee2code.com"', '"http://coffee2code.com/some/page"', $link );
-		$expect = str_replace( 'coffee2code.com<', 'coffee2code.com...<', $expect );
-		$result = $res == $expect ? 'PASS' : "FAIL : ($res) is not ($expect)";
-		echo "<li>Test #$i: $result</li>\n";
-		$i++;
-
-		// Test before and after text
-		$res = c2c_autohyperlink_link_urls( 'coffee2code.com', wp_parse_args( array( 'hyperlink_mode' => 11, 'truncation_before_text' => '(', 'truncation_after_text' => '...)' ), $default ) );
-		$expect = str_replace( 'coffee2code.com<', '(coffee2code...)<', $link );
-		$result = $res == $expect ? 'PASS' : "FAIL : ($res) is not ($expect)";
-		echo "<li>Test #$i: $result</li>\n";
-		$i++;
-
-		echo '</ul>';
+		$this->assertEquals(
+			$text,
+			c2c_autohyperlink_link_urls( $text )
+		);
 	}
-	endif;
-*/
+
+	public function test_filter_autohyperlink_urls_custom_exclusions_recognizes_false() {
+		add_filter( 'autohyperlink_urls_custom_exclusions', array( $this, 'autohyperlink_urls_custom_exclusions' ), 10, 3 );
+
+		$texts = array(
+			'Visit example.com soon.',
+			'Visit http://example.com soon.',
+		);
+
+		foreach ( $texts as $text ) {
+			$this->assertEquals(
+				$text,
+				c2c_autohyperlink_link_urls( $text )
+			);
+		}
+	}
 
 	/*
 	 * Misc
