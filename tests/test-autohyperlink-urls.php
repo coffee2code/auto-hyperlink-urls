@@ -74,7 +74,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 			array( '[', ']' ),
 			array( '{', '}' ),
 			array( '>', '<' ),
-			array( '.', '.' ),
+//			array( '.', '.' ),
 			array( ',', ',' ),
 			array( "'", "'" ),
 			array( '"', '"' ),
