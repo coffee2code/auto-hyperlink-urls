@@ -82,6 +82,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 			array( ':', ':' ),
 			array( ';', ';' ),
 			array( ';', '&' ),
+			array( "\n", "\n"),
 		);
 	}
 
@@ -215,7 +216,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	 */
 
 	public function test_basic_autolinking( $url = 'http://coffee2code.com', $text = '', $before = '', $after = '', $strip = true ) {
-		$out_text = $strip ? preg_replace( '~^.+://(.+)$~', '$1', $url ) : $url;
+		$out_text = $strip ? preg_replace( '~^.+://(.+)$~U', '$1', $url ) : $url;
 
 		if ( empty( $text ) ) {
 			$text = $out_text; //preg_replace( '~^.+://(.+)$~', '$1', $url );
@@ -300,6 +301,15 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$this->test_basic_autolinking( "http://coffee2code.{$tld}", "coffee2code.{$tld}" );
 	}
 
+	public function test_does_not_autolink_unknown_tlds() {
+		$text = 'coffee2code.zzz';
+
+		$this->assertEquals(
+			$text,
+			c2c_autohyperlink_link_urls( $text )
+		);
+	}
+
 	/**
 	 * @dataProvider get_protocols
 	 */
@@ -322,10 +332,33 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	public function test_does_not_autolink_already_linked_URL() {
+		$text = '<a href="http://example.com">example.com</a>';
 		$this->assertEquals(
-			'<a href="http://example.com">example.com</a>',
-			c2c_autohyperlink_link_urls( '<a href="http://example.com">http://example.com</a>' )
+			$text,
+			c2c_autohyperlink_link_urls( $text )
 		);
+	}
+
+	public function test_does_not_autolink_already_linked_URL_with_subdomain() {
+		$text = 'check out <a href="https://make.wordpress.org/">Make WordPress</a> and ';
+
+		$this->assertEquals(
+			$text,
+			c2c_autohyperlink_link_urls( $text )
+		);
+	}
+
+	public function test_does_not_autolink_domain_in_query_arg_of_already_linked_URL() {
+		$text = 'check out <a href="https://make.wordpress.org/?url=http://example.com">Make WordPress</a> and ';
+
+		$this->assertEquals(
+			$text,
+			c2c_autohyperlink_link_urls( $text )
+		);
+	}
+
+	public function test_does_not_autolink_domain_in_query_arg_of_domain_being_autolinked() {
+		$this->test_basic_autolinking( "http://coffee2code.com?url=http://example.com", "http://coffee2code.com?url=http://example.com" );
 	}
 
 	public function test_does_not_autolink_a_URL_within_linked_sentence() {
@@ -558,6 +591,162 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 			c2c_autohyperlink_link_urls( $link )
 		);
 
+	}
+
+	/*
+	 * Setting: hyperlink_commentss
+	*/
+
+	public function test_hyperlink_comments() {
+		// Since the setting is only consulted on plugin load, reset related filters
+		// to default and rerun filter registration.
+		add_filter( 'comment_text', 'make_clickable', 9 );
+		remove_filter( 'comment_text', array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ), 9 );
+
+		$this->set_option( array( 'hyperlink_comments' => false ) );
+		c2c_AutoHyperlinkURLs::get_instance()->register_filters();
+
+		$text = 'Comment containing example.com and user@example.com that shoud not get linked.';
+		// Note: If hyperlink_comments is false, then make_clickable() is still run,
+		// which would hyperlink the email address.
+		$expected = 'Comment containing example.com and <a href="mailto:user@example.com">user@example.com</a> that shoud not get linked.';
+
+		$this->assertEquals(
+			wpautop( $expected ),
+			apply_filters( 'comment_text', $text )
+		);
+	}
+
+	/*
+	 * Setting: hyperlink_emails
+	 */
+
+	public function test_hyperlink_emails() {
+		$this->set_option( array( 'hyperlink_emails' => false ) );
+
+		$text = 'Contact me at user@example.com at once.';
+
+		$this->assertEquals(
+			$text,
+			c2c_autohyperlink_link_urls( $text )
+		);
+	}
+
+	/*
+	 * Setting: hyperlink_mode
+	 */
+
+	public function test_hyperlink_mode_0() {
+		$this->set_option( array( 'hyperlink_mode' => 0 ) );
+
+		$expected = '<a href="http://coffee2code0123456789.com/page" class="autohyperlink" title="http://coffee2code0123456789.com/page" target="_blank">coffee2code0123456789.com/page</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code0123456789.com/page' )
+		);
+	}
+
+	public function test_hyperlink_mode_11() {
+		$this->set_option( array( 'hyperlink_mode' => 11 ) );
+
+		$expected = '<a href="http://coffee2code0123456789.com/page" class="autohyperlink" title="http://coffee2code0123456789.com/page" target="_blank">coffee2code...</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code0123456789.com/page' )
+		);
+	}
+
+	public function test_hyperlink_mode_truncation( $mode = 11 ) {
+		$this->set_option( array( 'hyperlink_mode' => $mode ) );
+
+		$expected = '<a href="http://coffee2code0123456789.com/page" class="autohyperlink" title="http://coffee2code0123456789.com/page" target="_blank">'
+			. substr( 'coffee2code0123456789.com', 0, $mode )
+			. '...</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code0123456789.com/page' )
+		);
+	}
+
+	public function test_hyperlink_mode_longer_truncation() {
+		$this->test_hyperlink_mode_truncation( 14 );
+	}
+
+	/*
+	 * Setting: truncation_before_text
+	 */
+
+	public function test_truncation_before_text_not_used_by_default() {
+		$this->set_option( array( 'truncation_before_text' => '!!!', 'hyperlink_mode' => 5 ) );
+
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">coffee2code0123456789.com/</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code0123456789.com/' )
+		);
+	}
+
+	public function test_truncation_before_text_applies_with_proper_hyperlink_mode() {
+		$this->set_option( array( 'truncation_before_text' => '!!!', 'hyperlink_mode' => 11 ) );
+
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">!!!coffee2code...</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code0123456789.com/' )
+		);
+	}
+
+	/*
+	 * Setting: truncation_after_text
+	 */
+
+	public function test_truncation_after_text_not_used_by_default() {
+		$this->set_option( array( 'truncation_after_text' => '!!!', 'hyperlink_mode' => 5 ) );
+
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">coffee2code0123456789.com/</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code0123456789.com/' )
+		);
+	}
+
+	public function test_truncation_after_text_applies_with_proper_hyperlink_mode() {
+		$this->set_option( array( 'truncation_after_text' => '!!!', 'hyperlink_mode' => 11 ) );
+
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">coffee2code!!!</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code0123456789.com/' )
+		);
+	}
+
+	public function test_truncation_before_text_and_truncation_after_text_apply_with_proper_hyperlink_mode() {
+		$this->set_option( array( 'truncation_before_text' => '(', 'truncation_after_text' => '...)', 'hyperlink_mode' => 11 ) );
+
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">(coffee2code...)</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code0123456789.com/' )
+		);
+	}
+
+	public function test_truncation_before_text_and_truncation_after_text_dont_apply_with_untruncated_link() {
+		$this->set_option( array( 'truncation_before_text' => '(', 'truncation_after_text' => '...)', 'hyperlink_mode' => 11 ) );
+
+		$expected = '<a href="http://example.com" class="autohyperlink" title="http://example.com" target="_blank">example.com</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'example.com' )
+		);
 	}
 
 	/*
