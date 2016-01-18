@@ -159,7 +159,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
 				'label' => __( 'Text to show after link truncation', 'auto-hyperlink-urls' )
 			),
 			'more_extensions' => array( 'input' => 'text', 'default' => '',
-				'label' => __( 'Extra domain extensions.', 'auto-hyperlink-urls' ),
+				'label' => __( 'Extra domain extensions', 'auto-hyperlink-urls' ),
 				'help'  => __( 'Space and/or comma-separated list of extensions/<acronym title="Top-Level Domains">TLDs</acronym>.<br />These are already built-in: com, org, net, gov, edu, mil, us, info, biz, ws, name, mobi, cc, tv', 'auto-hyperlink-urls' )
 			),
 		);
