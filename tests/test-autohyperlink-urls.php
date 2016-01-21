@@ -17,7 +17,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 
 		// Remove hooks.
 		remove_filter( 'autohyperlink_urls_class',             array( $this, 'autohyperlink_urls_class' ) );
-		remove_filter( 'autohyperlink_urls_link_attributes',   array( $this, 'autohyperlink_urls_link_attributes' ) );
+		remove_filter( 'autohyperlink_urls_link_attributes',   array( $this, 'autohyperlink_urls_link_attributes' ), 10, 2 );
 		remove_filter( 'autohyperlink_urls_tlds',              array( $this, 'autohyperlink_urls_tlds' ) );
 		remove_filter( 'autohyperlink_urls_exclude_domains',   array( $this, 'autohyperlink_urls_exclude_domains' ) );
 		remove_filter( 'autohyperlink_urls_custom_exclusions', array( $this, 'autohyperlink_urls_custom_exclusions' ), 10, 3 );
@@ -108,8 +108,11 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		return 'customclass';
 	}
 
-	public function autohyperlink_urls_link_attributes( $attributes ) {
-		return $attributes . ' id="id1"';
+	public function autohyperlink_urls_link_attributes( $attributes, $title = '' ) {
+		if ( $title ) {
+			$attributes['title'] = $title;
+		}
+		return $attributes;
 	}
 
 	public function autohyperlink_urls_tlds( $tlds ) {
@@ -176,7 +179,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 
 	public function test_default_value_of_open_in_new_window() {
 		$options = c2c_AutoHyperlinkURLs::get_instance()->get_options();
-		$this->assertTrue( $options['open_in_new_window'] );
+		$this->assertFalse( $options['open_in_new_window'] );
 	}
 
 	public function test_default_value_of_nofollow() {
@@ -207,7 +210,6 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_default_value_of_exclude_domains() {
 		$options = c2c_AutoHyperlinkURLs::get_instance()->get_options();
 		$this->assertEmpty( $options['exclude_domains'] );
-		var_dump($options['exclude_domains']);
 		$this->assertTrue( is_array( $options['exclude_domains'] ) );
 	}
 
@@ -223,7 +225,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		}
 
 
-		$expected =  $before . '<a href="' . esc_attr( $url ) . '" class="autohyperlink" title="' . esc_attr( $url ) . '" target="_blank">' . $out_text . '</a>' . $after;
+		$expected =  $before . '<a href="' . esc_attr( $url ) . '" class="autohyperlink">' . $out_text . '</a>' . $after;
 
 		$this->assertEquals(
 			$expected,
@@ -416,7 +418,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		}
 
 
-		$expected =  $before . '<a class="autohyperlink" href="mailto:' . esc_attr( $email ) . '" title="mailto:' . esc_attr( $email ) . '">' . $text . '</a>' . $after;
+		$expected =  $before . '<a class="autohyperlink" href="mailto:' . esc_attr( $email ) . '">' . $text . '</a>' . $after;
 
 		$this->assertEquals(
 			$expected,
@@ -473,7 +475,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_strip_protocol_false() {
 		$this->set_option( array( 'strip_protocol' => false ) );
 
-		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" title="http://coffee2code.com/" target="_blank">http://coffee2code.com/</a>';
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink">http://coffee2code.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -482,7 +484,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	public function test_strip_protocol_false_via_args() {
-		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" title="http://coffee2code.com/" target="_blank">http://coffee2code.com/</a>';
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink">http://coffee2code.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -494,10 +496,30 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	 * Setting: open_in_new_window
 	 */
 
+	public function test_open_in_new_window_true() {
+		$this->set_option( array( 'open_in_new_window' => true ) );
+
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" target="_blank">coffee2code.com/</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code.com/' )
+		);
+	}
+
+	public function test_open_in_new_window_true_via_args() {
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" target="_blank">coffee2code.com/</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code.com/', array( 'open_in_new_window' => true ) )
+		);
+	}
+
 	public function test_open_in_new_window_false() {
 		$this->set_option( array( 'open_in_new_window' => false ) );
 
-		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" title="http://coffee2code.com/">coffee2code.com/</a>';
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink">coffee2code.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -506,7 +528,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	public function test_open_in_new_window_false_via_args() {
-		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" title="http://coffee2code.com/">coffee2code.com/</a>';
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink">coffee2code.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -521,7 +543,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_nofollow_true() {
 		$this->set_option( array( 'nofollow' => true ) );
 
-		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" title="http://coffee2code.com/" target="_blank" rel="nofollow">coffee2code.com/</a>';
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" rel="nofollow">coffee2code.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -530,7 +552,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	public function test_nofollow_true_via_args() {
-		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" title="http://coffee2code.com/" target="_blank" rel="nofollow">coffee2code.com/</a>';
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" rel="nofollow">coffee2code.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -553,7 +575,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$this->set_option( array( 'more_extensions' => 'co io' ) );
 
 		$this->assertEquals(
-			'<a href="http://coffee2code.io" class="autohyperlink" title="http://coffee2code.io" target="_blank">coffee2code.io</a>',
+			'<a href="http://coffee2code.io" class="autohyperlink">coffee2code.io</a>',
 			c2c_autohyperlink_link_urls( $link )
 		);
 
@@ -570,7 +592,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$this->set_option( array( 'more_extensions' => 'co,io' ) );
 
 		$this->assertEquals(
-			'<a href="http://coffee2code.io" class="autohyperlink" title="http://coffee2code.io" target="_blank">coffee2code.io</a>',
+			'<a href="http://coffee2code.io" class="autohyperlink">coffee2code.io</a>',
 			c2c_autohyperlink_link_urls( $link )
 		);
 
@@ -587,7 +609,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$this->set_option( array( 'more_extensions' => 'co, io' ) );
 
 		$this->assertEquals(
-			'<a href="http://coffee2code.io" class="autohyperlink" title="http://coffee2code.io" target="_blank">coffee2code.io</a>',
+			'<a href="http://coffee2code.io" class="autohyperlink">coffee2code.io</a>',
 			c2c_autohyperlink_link_urls( $link )
 		);
 
@@ -639,7 +661,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_hyperlink_mode_0() {
 		$this->set_option( array( 'hyperlink_mode' => 0 ) );
 
-		$expected = '<a href="http://coffee2code0123456789.com/page" class="autohyperlink" title="http://coffee2code0123456789.com/page" target="_blank">coffee2code0123456789.com/page</a>';
+		$expected = '<a href="http://coffee2code0123456789.com/page" class="autohyperlink">coffee2code0123456789.com/page</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -650,7 +672,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_hyperlink_mode_11() {
 		$this->set_option( array( 'hyperlink_mode' => 11 ) );
 
-		$expected = '<a href="http://coffee2code0123456789.com/page" class="autohyperlink" title="http://coffee2code0123456789.com/page" target="_blank">coffee2code...</a>';
+		$expected = '<a href="http://coffee2code0123456789.com/page" class="autohyperlink">coffee2code...</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -661,7 +683,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_hyperlink_mode_truncation( $mode = 11 ) {
 		$this->set_option( array( 'hyperlink_mode' => $mode ) );
 
-		$expected = '<a href="http://coffee2code0123456789.com/page" class="autohyperlink" title="http://coffee2code0123456789.com/page" target="_blank">'
+		$expected = '<a href="http://coffee2code0123456789.com/page" class="autohyperlink">'
 			. substr( 'coffee2code0123456789.com', 0, $mode )
 			. '...</a>';
 
@@ -682,7 +704,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_truncation_before_text_not_used_by_default() {
 		$this->set_option( array( 'truncation_before_text' => '!!!', 'hyperlink_mode' => 5 ) );
 
-		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">coffee2code0123456789.com/</a>';
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink">coffee2code0123456789.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -693,7 +715,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_truncation_before_text_applies_with_proper_hyperlink_mode() {
 		$this->set_option( array( 'truncation_before_text' => '!!!', 'hyperlink_mode' => 11 ) );
 
-		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">!!!coffee2code...</a>';
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink">!!!coffee2code...</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -708,7 +730,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_truncation_after_text_not_used_by_default() {
 		$this->set_option( array( 'truncation_after_text' => '!!!', 'hyperlink_mode' => 5 ) );
 
-		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">coffee2code0123456789.com/</a>';
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink">coffee2code0123456789.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -719,7 +741,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_truncation_after_text_applies_with_proper_hyperlink_mode() {
 		$this->set_option( array( 'truncation_after_text' => '!!!', 'hyperlink_mode' => 11 ) );
 
-		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">coffee2code!!!</a>';
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink">coffee2code!!!</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -730,7 +752,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_truncation_before_text_and_truncation_after_text_apply_with_proper_hyperlink_mode() {
 		$this->set_option( array( 'truncation_before_text' => '(', 'truncation_after_text' => '...)', 'hyperlink_mode' => 11 ) );
 
-		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink" title="http://coffee2code0123456789.com/" target="_blank">(coffee2code...)</a>';
+		$expected = '<a href="http://coffee2code0123456789.com/" class="autohyperlink">(coffee2code...)</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -741,7 +763,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_truncation_before_text_and_truncation_after_text_dont_apply_with_untruncated_link() {
 		$this->set_option( array( 'truncation_before_text' => '(', 'truncation_after_text' => '...)', 'hyperlink_mode' => 11 ) );
 
-		$expected = '<a href="http://example.com" class="autohyperlink" title="http://example.com" target="_blank">example.com</a>';
+		$expected = '<a href="http://example.com" class="autohyperlink">example.com</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -778,7 +800,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		add_filter( 'autohyperlink_urls_tlds', array( $this, 'autohyperlink_urls_tlds' ) );
 
 		$this->assertEquals(
-			'<a href="http://coffee2code.io" class="autohyperlink" title="http://coffee2code.io" target="_blank">coffee2code.io</a>',
+			'<a href="http://coffee2code.io" class="autohyperlink">coffee2code.io</a>',
 			c2c_autohyperlink_link_urls( $link )
 		);
 	}
@@ -786,7 +808,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_filter_autohyperlink_urls_class() {
 		add_filter( 'autohyperlink_urls_class', array( $this, 'autohyperlink_urls_class' ) );
 
-		$expected = '<a href="http://coffee2code.com/" class="customclass" title="http://coffee2code.com/" target="_blank">coffee2code.com/</a>';
+		$expected = '<a href="http://coffee2code.com/" class="customclass">coffee2code.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -795,9 +817,9 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	public function test_filter_autohyperlink_urls_link_attributes() {
-		add_filter( 'autohyperlink_urls_link_attributes', array( $this, 'autohyperlink_urls_link_attributes' ) );
+		add_filter( 'autohyperlink_urls_link_attributes', array( $this, 'autohyperlink_urls_link_attributes' ), 10, 2 );
 
-		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" title="http://coffee2code.com/" target="_blank" id="id1">coffee2code.com/</a>';
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" title="http://coffee2code.com/">coffee2code.com/</a>';
 
 		$this->assertEquals(
 			$expected,
@@ -841,8 +863,8 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'Visit <a href="http://coffee2code.com" class="autohyperlink" title="http://coffee2code.com" target="_blank">coffee2code.com</a> soon.',
-			'Visit <a href="http://coffee2code.com" class="autohyperlink" title="http://coffee2code.com" target="_blank">coffee2code.com</a> soon.',
+			'Visit <a href="http://coffee2code.com" class="autohyperlink">coffee2code.com</a> soon.',
+			'Visit <a href="http://coffee2code.com" class="autohyperlink">coffee2code.com</a> soon.',
 		);
 
 		foreach ( $before as $key => $text ) {

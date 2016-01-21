@@ -142,7 +142,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
 				'label' => __( 'Strip protocol?', 'auto-hyperlink-urls' ),
 				'help'  => __( 'Remove the protocol (i.e. \'http://\') from the displayed auto-hyperlinked link?', 'auto-hyperlink-urls' )
 			),
-			'open_in_new_window' => array( 'input' => 'checkbox', 'default' => true,
+			'open_in_new_window' => array( 'input' => 'checkbox', 'default' => false,
 				'label' => __( 'Open auto-hyperlinked links in new window?', 'auto-hyperlink-urls' )
 			),
 			'nofollow' => array( 'input' => 'checkbox', 'default' => false,
@@ -225,21 +225,25 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
 	public function get_link_attributes( $title = '' ) {
 		$options = $this->get_options();
 
-		$link_attributes = 'class="' . $this->get_class() . '"';
-
-		if ( $title ) {
-			$link_attributes .= ' title="' . esc_attr( $title ) . '"';
-		}
+		$link_attributes['class'] = $this->get_class();
 
 		if ( $options['open_in_new_window'] ) {
-			$link_attributes .= ' target="_blank"';
+			$link_attributes['target'] = '_blank';
 		}
 
 		if ( $options['nofollow'] ) {
-			$link_attributes .= ' rel="nofollow"';
+			$link_attributes['rel'] = 'nofollow';
 		}
 
-		return apply_filters( 'autohyperlink_urls_link_attributes', $link_attributes );
+		$link_attributes = (array) apply_filters( 'autohyperlink_urls_link_attributes', $link_attributes, $title );
+
+		// Assemble the attributes into a string.
+		$output_attributes = '';
+		foreach ( $link_attributes as $key => $val ) {
+			$output_attributes .= $key . '="' . esc_attr( $val ) . '" ';
+		}
+
+		return trim( $output_attributes );
 	}
 
 	/**
@@ -457,7 +461,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
 	public function do_hyperlink_email( $matches ) {
 		$email = $matches[1] . '@' . $matches[2];
 
-		return "<a class=\"" . $this->get_class() . "\" href=\"mailto:$email\" title=\"mailto:$email\">"
+		return "<a class=\"" . $this->get_class() . "\" href=\"mailto:$email\">"
 			. $this->truncate_link( $email )
 			. '</a>';
 	}
