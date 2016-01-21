@@ -17,7 +17,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 
 		// Remove hooks.
 		remove_filter( 'autohyperlink_urls_class',             array( $this, 'autohyperlink_urls_class' ) );
-		remove_filter( 'autohyperlink_urls_link_attributes',   array( $this, 'autohyperlink_urls_link_attributes' ), 10, 2 );
+		remove_filter( 'autohyperlink_urls_link_attributes',   array( $this, 'autohyperlink_urls_link_attributes' ), 10, 3 );
 		remove_filter( 'autohyperlink_urls_tlds',              array( $this, 'autohyperlink_urls_tlds' ) );
 		remove_filter( 'autohyperlink_urls_exclude_domains',   array( $this, 'autohyperlink_urls_exclude_domains' ) );
 		remove_filter( 'autohyperlink_urls_custom_exclusions', array( $this, 'autohyperlink_urls_custom_exclusions' ), 10, 3 );
@@ -108,7 +108,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		return 'customclass';
 	}
 
-	public function autohyperlink_urls_link_attributes( $attributes, $title = '' ) {
+	public function autohyperlink_urls_link_attributes( $attributes, $context = 'url', $title = '' ) {
 		if ( $title ) {
 			$attributes['title'] = $title;
 		}
@@ -418,7 +418,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		}
 
 
-		$expected =  $before . '<a class="autohyperlink" href="mailto:' . esc_attr( $email ) . '">' . $text . '</a>' . $after;
+		$expected =  $before . '<a href="mailto:' . esc_attr( $email ) . '" class="autohyperlink">' . $text . '</a>' . $after;
 
 		$this->assertEquals(
 			$expected,
@@ -817,7 +817,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	public function test_filter_autohyperlink_urls_link_attributes() {
-		add_filter( 'autohyperlink_urls_link_attributes', array( $this, 'autohyperlink_urls_link_attributes' ), 10, 2 );
+		add_filter( 'autohyperlink_urls_link_attributes', array( $this, 'autohyperlink_urls_link_attributes' ), 10, 3 );
 
 		$expected = '<a href="http://coffee2code.com/" class="autohyperlink" title="http://coffee2code.com/">coffee2code.com/</a>';
 

@@ -208,7 +208,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
 	 * @return string Class to assign to link.
 	 */
 	public function get_class() {
-		return esc_attr( apply_filters( 'autohyperlink_urls_class', 'autohyperlink' ) );
+		return apply_filters( 'autohyperlink_urls_class', 'autohyperlink' );
 	}
 
 	/**
@@ -217,25 +217,32 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
 	 * Utilizes plugin options to determine if attributes such as 'target' and
 	 * 'nofollow' should be used. Calls get_class() to determine the
 	 * appropriate class name(s).
+	 *
 	 * Can be filtered via 'autohyperlink_urls_link_attributes' filter.
 	 *
 	 * @param  string $title Optional. The text for the link's title attribute.
+	 * @param  string $context Optional. The context for the link attributes. Either 'url' or 'email'. Default 'url'.
 	 * @return string The entire HTML attributes string to be used for link.
 	 */
-	public function get_link_attributes( $title = '' ) {
+	public function get_link_attributes( $title = '', $context = 'url' ) {
 		$options = $this->get_options();
+
+		$context = 'email' === $context ? 'email' : 'url';
 
 		$link_attributes['class'] = $this->get_class();
 
-		if ( $options['open_in_new_window'] ) {
-			$link_attributes['target'] = '_blank';
+		// URL specific attributes.
+		if ( 'url' === $context ) {
+			if ( $options['open_in_new_window'] ) {
+				$link_attributes['target'] = '_blank';
+			}
+
+			if ( $options['nofollow'] ) {
+				$link_attributes['rel'] = 'nofollow';
+			}
 		}
 
-		if ( $options['nofollow'] ) {
-			$link_attributes['rel'] = 'nofollow';
-		}
-
-		$link_attributes = (array) apply_filters( 'autohyperlink_urls_link_attributes', $link_attributes, $title );
+		$link_attributes = (array) apply_filters( 'autohyperlink_urls_link_attributes', $link_attributes, $context, $title );
 
 		// Assemble the attributes into a string.
 		$output_attributes = '';
@@ -461,7 +468,9 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
 	public function do_hyperlink_email( $matches ) {
 		$email = $matches[1] . '@' . $matches[2];
 
-		return "<a class=\"" . $this->get_class() . "\" href=\"mailto:$email\">"
+		return '<a '
+			. 'href="mailto:' . esc_attr( $email ) . '" '
+			. $this->get_link_attributes( $email, 'email' ) . '>'
 			. $this->truncate_link( $email )
 			. '</a>';
 	}
