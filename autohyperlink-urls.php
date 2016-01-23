@@ -375,7 +375,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 		}
 
 		// Remove links within links
-		$text = preg_replace( "#(<a [^>]+>)(.*)<a [^>]+>([^<]*)</a>([^>]*)</a>#iU", "$1$2$3$4</a>" , $text );
+		$text = preg_replace( "#(<a\s+[^>]+>)(.*)<a [^>]+>([^<]*)</a>([^>]*)</a>#iU", "$1$2$3$4</a>" , $text );
 
 		// Remove temporarily added leading and trailing single spaces before returning.
 		return substr( $text, 1, -1 );
