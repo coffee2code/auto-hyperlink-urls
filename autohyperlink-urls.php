@@ -425,7 +425,9 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 		$link_text = $options['strip_protocol'] ? $matches[4] : $matches[2];
 
 		return $matches[1]
-			. '<a href="' . esc_url( $matches[2] ) . '" ' . $this->get_link_attributes( $matches[2] ) . '>'
+			. '<a href="' . esc_url( $matches[2] ) . '"'
+			. rtrim( ' ' . $this->get_link_attributes( $url ) )
+			. '>'
 			. $this->truncate_link( $link_text )
 			. '</a>';
 	}
@@ -454,7 +456,9 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 			$after = '';
 		}
 		return $matches[1]
-			. '<a href="' . esc_url( 'http://' . $dest ) . '" ' . $this->get_link_attributes( "http://$dest" ) . '>'
+			. '<a href="' . esc_url( 'http://' . $dest ) . '"'
+			. rtrim( ' ' . $this->get_link_attributes( "http://$dest" ) )
+			. '>'
 			. $this->truncate_link( $dest )
 			. '</a>'
 			. $after;
@@ -470,8 +474,9 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 		$email = $matches[1] . '@' . $matches[2];
 
 		return '<a '
-			. 'href="mailto:' . esc_attr( $email ) . '" '
-			. $this->get_link_attributes( $email, 'email' ) . '>'
+			. 'href="mailto:' . esc_attr( $email ) . '"'
+			. rtrim( ' ' . $this->get_link_attributes( $email ) )
+			. '>'
 			. $this->truncate_link( $email )
 			. '</a>';
 	}
