@@ -410,6 +410,18 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_url_without_uri_scheme_except_as_query_arg() {
+		$this->set_option( array( 'strip_protocol' => false ) );
+
+		$text = 'Visit me at example.com?ref=http://example.net if you wish.';
+		$expected = 'Visit me at <a href="http://example.com?ref=http://example.net" class="autohyperlink">example.com?ref=http://example.net</a> if you wish.';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( $text )
+		);
+	}
+
 	/*
 	 * Email.
 	 */
