@@ -359,8 +359,27 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 		);
 
 		// Link links that have an explicit protocol.
+		$protocol_regex =  '~
+			(?!<.*?)                                           # Non-capturing check to ensure not matching what looks like the inside of an HTML tag.
+			(?<=[\s>.,:;!?])                                         # 1: Leading whitespace or character.
+			(\(?)                                              # Maybe an open parenthesis?
+			(                                                  # 2: Full URL
+				([\w]{1,20}?://)                               # 3: Scheme and hier-part prefix
+				(                                              # 4: URL minus protocol
+					(?=\S{1,2000}\s)                           # Limit to URLs less than about 2000 characters long
+					[\\w\\x80-\\xff#%\\~/@\\[\\]*(+=&$-]*+     # Non-punctuation URL character
+					(?:                                        # Unroll the Loop: Only allow puctuation URL character if followed by a non-punctuation URL character
+						[\'.,;:!?)]                            # Punctuation URL character
+						[\\w\\x80-\\xff#%\\~/@\\[\\]*(+=&$-]++ # Non-punctuation URL character
+					)*
+				)
+			)
+			(\)?)                                              # 5: Trailing closing parenthesis (for parethesis balancing post processing)
+			(?![^<>]*?>) # Check to ensure not within what looks like an HTML tag.
+		~ixS';
+
 		$text = preg_replace_callback(
-			'#(?!<.*?)(?<=[\s>])(\()?(([\w]+?)://((?:[\w\\x80-\\xff\#$%&~/\-=?@\[\](+]|[.,;:](?![\s<])|(?(1)\)(?![\s<])|\)))+))(?![^<>]*?>)#is',
+			$protocol_regex,
 			array( $this, 'do_hyperlink_url' ),
 			$text
 		);
@@ -432,14 +451,42 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 			return $matches[0];
 		}
 
-		$link_text = $options['strip_protocol'] ? $matches[4] : $matches[2];
+		// Handle parentheses balancing.
+		$url = $matches[2];
+
+		if ( ')' == $matches[5] && strpos( $url, '(' ) ) {
+			// If the trailing character is a closing parethesis, and the URL has an opening parenthesis in it, add the closing parenthesis to the URL.
+			// Then we can let the parenthesis balancer do its thing below.
+			$url .= $matches[5];
+			$suffix = '';
+		} else {
+			$suffix = $matches[5];
+		}
+
+		// Include parentheses in the URL only if paired
+		while ( substr_count( $url, '(' ) < substr_count( $url, ')' ) ) {
+			$suffix = strrchr( $url, ')' ) . $suffix;
+			$url = substr( $url, 0, strrpos( $url, ')' ) );
+		}
+
+		$url = esc_url( $url );
+
+		// Check whether URI scheme should be retained for link text.
+		$link_text = $url;
+		if ( $options['strip_protocol'] ) {
+			$n = strpos( $url, '://' );
+			if ( false !== $n ) {
+				$link_text = substr( $url, $n+3 );
+			}
+		}
 
 		return $matches[1]
-			. '<a href="' . esc_url( $matches[2] ) . '"'
+			. '<a href="' . $url . '"'
 			. rtrim( ' ' . $this->get_link_attributes( $url ) )
 			. '>'
 			. $this->truncate_link( $link_text )
-			. '</a>';
+			. '</a>'
+			. $suffix;
 	}
 
 	/**
