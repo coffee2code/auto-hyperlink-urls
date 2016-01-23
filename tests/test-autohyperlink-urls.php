@@ -219,6 +219,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	 */
 
 	public function test_basic_autolinking( $url = 'http://coffee2code.com', $text = '', $before = '', $after = '', $strip = true ) {
+		$url = esc_url( $url );
 		$out_text = $strip ? preg_replace( '~^.+://(.+)$~U', '$1', $url ) : $url;
 
 		if ( empty( $text ) ) {
@@ -226,7 +227,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		}
 
 
-		$expected =  $before . '<a href="' . esc_attr( $url ) . '" class="autohyperlink">' . $out_text . '</a>' . $after;
+		$expected =  $before . '<a href="' . esc_url( $url ) . '" class="autohyperlink">' . $out_text . '</a>' . $after;
 
 		$this->assertEquals(
 			$expected,
