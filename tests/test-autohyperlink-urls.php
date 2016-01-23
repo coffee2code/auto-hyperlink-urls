@@ -96,6 +96,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 
 	public function set_option( $settings = array() ) {
 		c2c_AutoHyperlinkURLs::get_instance()->load_config();
+		c2c_AutoHyperlinkURLs::get_instance()->verify_config();
 		$settings = wp_parse_args( $settings, c2c_AutoHyperlinkURLs::get_instance()->get_options() );
 		c2c_AutoHyperlinkURLs::get_instance()->update_option( $settings, true );
 	}
@@ -143,11 +144,11 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	public function test_plugin_framework_class_name() {
-		$this->assertTrue( class_exists( 'c2c_AutoHyperlinkURLs_Plugin_040' ) );
+		$this->assertTrue( class_exists( 'c2c_AutoHyperlinkURLs_Plugin_041' ) );
 	}
 
 	public function test_plugin_framework_version() {
-		$this->assertEquals( '040', c2c_AutoHyperlinkURLs::get_instance()->c2c_plugin_version() );
+		$this->assertEquals( '041', c2c_AutoHyperlinkURLs::get_instance()->c2c_plugin_version() );
 	}
 
 	public function test_get_version() {

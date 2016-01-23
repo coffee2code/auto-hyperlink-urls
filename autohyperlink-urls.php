@@ -29,6 +29,7 @@
  *   # of chars for first part, # of chars for ending, and truncation string?)
  * - Option to specify hosts to prevent truncation (so stuff like youtube.com autoembeds work)
  *   (or better if it solves this situation: simply filter text later)
+ * - Inline docs for all hooks.
  */
 
 /*
@@ -55,7 +56,7 @@ if ( ! class_exists( 'c2c_AutoHyperlinkURLs' ) ) :
 
 require_once( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'c2c-plugin.php' );
 
-final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_040 {
+final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 
 	/**
 	 * The one true instance.
