@@ -299,10 +299,11 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 	 * truncate the supplied URL, optionally adding text before and/or
 	 * after the URL if truncated.
 	 *
-	 * @param string $url The URL to potentially truncate
+	 * @param string $url     The URL to potentially truncate
+	 * @param string $context Optional. The context for the link. Either 'url' or 'email'. Default 'email'.
 	 * @return string the potentially truncated version of the URL
 	 */
-	public function truncate_link( $url ) {
+	public function truncate_link( $url, $context = 'url' ) {
 		$options         = $this->get_options();
 		$mode            = intval( $options['hyperlink_mode'] );
 		$more_extensions = $options['more_extensions'];
@@ -318,7 +319,16 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 			$url = $trunc_before . substr( $url, 0, $mode ) . $trunc_after;
 		}
 
-		return apply_filters( 'autohyperlink_urls_truncate_link', $url, $original_url );
+		if ( 'email' === $context ) {
+			$url = esc_attr( $url );
+		} elseif ( preg_match( "~^[a-z]+://~i", $url ) ) {
+			$url = esc_url( $url );
+		} else {
+			$ourl = 'http://' . $url;
+			$url = substr( esc_url( $ourl ), 7 );
+		}
+
+		return apply_filters( 'autohyperlink_urls_truncate_link', $url, $original_url, $context );
 	}
 
 	/**
@@ -475,9 +485,9 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 
 		return '<a '
 			. 'href="mailto:' . esc_attr( $email ) . '"'
-			. rtrim( ' ' . $this->get_link_attributes( $email ) )
+			. rtrim( ' ' . $this->get_link_attributes( $email, 'email' ) )
 			. '>'
-			. $this->truncate_link( $email )
+			. $this->truncate_link( $email, 'email' )
 			. '</a>';
 	}
 } // end c2c_AutoHyperlinkURLs
