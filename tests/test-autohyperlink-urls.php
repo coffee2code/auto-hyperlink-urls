@@ -410,6 +410,17 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_does_not_autolink_URL_already_autolinked() {
+		$this->set_option( array( 'strip_protocol' => false ) );
+
+		$text = 'Visit me at <a href="http://coffee2code.com">http://coffee2code.com</a> if you wish.';
+
+		$this->assertEquals(
+			$text,
+			c2c_autohyperlink_link_urls( $text )
+		);
+	}
+
 	public function test_url_without_uri_scheme_except_as_query_arg() {
 		$this->set_option( array( 'strip_protocol' => false ) );
 
