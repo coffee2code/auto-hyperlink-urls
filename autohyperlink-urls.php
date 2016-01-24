@@ -365,65 +365,64 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 					}
 				}
 			} else {
+				$options = $this->get_options();
 
-		$options = $this->get_options();
+				if ( $args ) {
+					$options = $this->options = wp_parse_args( $args, $options );
+				}
 
-		if ( $args ) {
-			$options = $this->options = wp_parse_args( $args, $options );
-		}
+				// Temporarily introduce a leading and trailing single space to the text to simplify regex handling.
+				$ret = " $piece ";
 
-		// Temporarily introduce a leading and trailing single space to the text to simplify regex handling.
-		$ret = " $piece ";
+				// Get the regex-style list of domain extensions that are acceptable for non-protocoled links.
+				$extensions = $this->get_tlds();
 
-		// Get the regex-style list of domain extensions that are acceptable for non-protocoled links.
-		$extensions = $this->get_tlds();
+				// Link links that don't have a protocol.
+				$ret = preg_replace_callback(
+					"#(?!<.*?)([\s{}\(\)\[\]>,\'\";:])([a-z0-9]+[a-z0-9\-\.]*)\.($extensions)((?:[/\#?][^\s<{}\(\)\[\]]*[^\.,\s<{}\(\)\[\]]?)?)(?![^<>]*?>)#is",
+					array( $this, 'do_hyperlink_url_no_proto' ),
+					$ret
+				);
 
-		// Link links that don't have a protocol.
-		$ret = preg_replace_callback(
-			"#(?!<.*?)([\s{}\(\)\[\]>,\'\";:])([a-z0-9]+[a-z0-9\-\.]*)\.($extensions)((?:[/\#?][^\s<{}\(\)\[\]]*[^\.,\s<{}\(\)\[\]]?)?)(?![^<>]*?>)#is",
-			array( $this, 'do_hyperlink_url_no_proto' ),
-			$ret
-		);
+				// Link links that have an explicit protocol.
+				$protocol_regex =  '~
+					(?!<.*?)                                           # Non-capturing check to ensure not matching what looks like the inside of an HTML tag.
+					(?<=[\s>.,:;!?])                                   # 1: Leading whitespace or character.
+					(\(?)                                              # Maybe an open parenthesis?
+					(                                                  # 2: Full URL
+						([\w]{1,20}?://)                               # 3: Scheme and hier-part prefix
+						(                                              # 4: URL minus protocol
+							(?=\S{1,2000}\s)                           # Limit to URLs less than about 2000 characters long
+							[\\w\\x80-\\xff#%\\~/@\\[\\]*(+=&$-]*+     # Non-punctuation URL character
+							(?:                                        # Unroll the Loop: Only allow puctuation URL character if followed by a non-punctuation URL character
+								[\'.,;:!?)]                            # Punctuation URL character
+								[\\w\\x80-\\xff#%\\~/@\\[\\]*(+=&$-]++ # Non-punctuation URL character
+							)*
+						)
+					)
+					(\)?)                                              # 5: Trailing closing parenthesis (for parethesis balancing post processing)
+					(?![^<>]*?>) # Check to ensure not within what looks like an HTML tag.
+				~ixS';
 
-		// Link links that have an explicit protocol.
-		$protocol_regex =  '~
-			(?!<.*?)                                           # Non-capturing check to ensure not matching what looks like the inside of an HTML tag.
-			(?<=[\s>.,:;!?])                                         # 1: Leading whitespace or character.
-			(\(?)                                              # Maybe an open parenthesis?
-			(                                                  # 2: Full URL
-				([\w]{1,20}?://)                               # 3: Scheme and hier-part prefix
-				(                                              # 4: URL minus protocol
-					(?=\S{1,2000}\s)                           # Limit to URLs less than about 2000 characters long
-					[\\w\\x80-\\xff#%\\~/@\\[\\]*(+=&$-]*+     # Non-punctuation URL character
-					(?:                                        # Unroll the Loop: Only allow puctuation URL character if followed by a non-punctuation URL character
-						[\'.,;:!?)]                            # Punctuation URL character
-						[\\w\\x80-\\xff#%\\~/@\\[\\]*(+=&$-]++ # Non-punctuation URL character
-					)*
-				)
-			)
-			(\)?)                                              # 5: Trailing closing parenthesis (for parethesis balancing post processing)
-			(?![^<>]*?>) # Check to ensure not within what looks like an HTML tag.
-		~ixS';
+				$ret = preg_replace_callback(
+					$protocol_regex,
+					array( $this, 'do_hyperlink_url' ),
+					$ret
+				);
 
-		$ret = preg_replace_callback(
-			$protocol_regex,
-			array( $this, 'do_hyperlink_url' ),
-			$ret
-		);
+				// Link email addresses, if enabled to do so.
+				if ( $options['hyperlink_emails'] ) {
+					$ret = preg_replace_callback(
+						'#(?!<.*?)([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})(?![^<>]*?>)#i',
+						array( $this, 'do_hyperlink_email' ),
+						$ret
+					);
+				}
 
-		// Link email addresses, if enabled to do so.
-		if ( $options['hyperlink_emails'] ) {
-			$ret = preg_replace_callback(
-				'#(?!<.*?)([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})(?![^<>]*?>)#i',
-				array( $this, 'do_hyperlink_email' ),
-				$ret
-			);
-		}
+				// Remove temporarily added leading and trailing single spaces.
+				$ret = substr( $ret, 1, -1 );
 
-		// Remove temporarily added leading and trailing single spaces.
-		$ret = substr( $ret, 1, -1 );
-
-		$r .= $ret;
+				$r .= $ret;
 
 			} // else
 
@@ -478,7 +477,6 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 	 */
 	public function do_hyperlink_url( $matches ) {
 		$options = $this->get_options();
-
 		// Check to see if the link should actually be hyperlinked.
 		if ( ! $this->can_do_hyperlink( $matches[0] ) ) {
 			return $matches[0];
