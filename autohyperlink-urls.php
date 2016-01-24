@@ -21,14 +21,10 @@
 
 /*
  * TODO:
- * - Filter/option to disable class B domain autolinking (the non protocol urls)
- * - Way to exclude pages from autolinking? (Q on forums)
  * - Test against oembeds (and Viper's Video Quicktags). Run at 11+ priority?
  * - More tests (incl. testing filters)
  * - Ability to truncate middle of link http://domain.com/som...file.php (config options for
  *   # of chars for first part, # of chars for ending, and truncation string?)
- * - Option to specify hosts to prevent truncation (so stuff like youtube.com autoembeds work)
- *   (or better if it solves this situation: simply filter text later)
  * - Inline docs for all hooks.
  */
 
@@ -134,20 +130,23 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 		$this->config = array(
 			'hyperlink_comments' => array( 'input' => 'checkbox', 'default' => true,
 				'label' => __( 'Auto-hyperlink comments?', 'auto-hyperlink-urls' ),
-				'help'  => __( 'Note that if disabled WordPress\'s built-in hyperlinking function will still be performed, which links email addresses and text URLs with explicit protocols.', 'auto-hyperlink-urls' ),
+				'help'  => __( 'Note that if disabled WordPress&#8217;s built-in hyperlinking function will still be performed, which links email addresses and text URLs with explicit URI schemes.', 'auto-hyperlink-urls' ),
 			),
 			'hyperlink_emails' => array( 'input' => 'checkbox', 'default' => true,
 				'label' => __( 'Hyperlink email addresses?', 'auto-hyperlink-urls' )
 			),
 			'strip_protocol' => array( 'input' => 'checkbox', 'default' => true,
-				'label' => __( 'Strip protocol?', 'auto-hyperlink-urls' ),
-				'help'  => __( 'Remove the protocol (i.e. \'http://\') from the displayed auto-hyperlinked link?', 'auto-hyperlink-urls' )
+				'label' => __( 'Strip URI scheme?', 'auto-hyperlink-urls' ),
+				'help'  => sprintf(
+					__( 'Remove the <a href="%s">URI scheme</a> (i.e. \'http://\') from the displayed auto-hyperlinked link?', 'auto-hyperlink-urls' ),
+					'https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Conceptual_distinctions'
+				),
 			),
 			'open_in_new_window' => array( 'input' => 'checkbox', 'default' => false,
 				'label' => __( 'Open auto-hyperlinked links in new window?', 'auto-hyperlink-urls' )
 			),
 			'nofollow' => array( 'input' => 'checkbox', 'default' => false,
-				'label' => __( 'Enable <a href="http://en.wikipedia.org/wiki/Nofollow">nofollow</a>?', 'auto-hyperlink-urls' )
+				'label' => sprintf( __( 'Enable <a href="%s">nofollow</a>?', 'auto-hyperlink-urls' ), 'http://en.wikipedia.org/wiki/Nofollow' ),
 			),
 			'hyperlink_mode' => array( 'input' => 'shorttext', 'default' => 0,
 				'label' => __( 'Hyperlink Mode/Truncation', 'auto-hyperlink-urls' ),
@@ -166,7 +165,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 			'exclude_domains' => array( 'input' => 'inline_textarea', 'datatype' => 'array',
 				'no_wrap' => true, 'input_attributes' => 'rows="6"',
 				'label' => __( 'Exclude domains', 'auto-hyperlink-urls' ),
-				'help' => __( 'List domains that should NOT get automatically hyperlinked. One domain per line. Do not include protocol (e.g. "http://") or trailing slash.', 'auto-hyperlink-urls' ),
+				'help' => __( 'List domains that should NOT get automatically hyperlinked. One domain per line. Do not include URI scheme (e.g. "http://") or trailing slash.', 'auto-hyperlink-urls' ),
 			),
 		);
 	}
@@ -221,7 +220,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 	 *
 	 * Can be filtered via 'autohyperlink_urls_link_attributes' filter.
 	 *
-	 * @param  string $title Optional. The text for the link's title attribute.
+	 * @param  string $title   Optional. The text for the link's title attribute.
 	 * @param  string $context Optional. The context for the link attributes. Either 'url' or 'email'. Default 'url'.
 	 * @return string The entire HTML attributes string to be used for link.
 	 */
@@ -258,7 +257,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 	 * Returns the TLDs recognized by the plugin.
 	 *
 	 * Returns a '|'-separated string of TLDs recognized by the plugin to be
-	 * used in searches for non-protocoled text links.
+	 * used in searches for text links without URI scheme.
 	 *
 	 * By default this is:
 	 * 'com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv'.  More
@@ -374,24 +373,24 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 				// Temporarily introduce a leading and trailing single space to the text to simplify regex handling.
 				$ret = " $piece ";
 
-				// Get the regex-style list of domain extensions that are acceptable for non-protocoled links.
+				// Get the regex-style list of domain extensions that are acceptable for links without URI scheme.
 				$extensions = $this->get_tlds();
 
-				// Link links that don't have a protocol.
+				// Link links that don't have a URI scheme.
 				$ret = preg_replace_callback(
 					"#(?!<.*?)([\s{}\(\)\[\]>,\'\";:])([a-z0-9]+[a-z0-9\-\.]*)\.($extensions)((?:[/\#?][^\s<{}\(\)\[\]]*[^\.,\s<{}\(\)\[\]]?)?)(?![^<>]*?>)#is",
-					array( $this, 'do_hyperlink_url_no_proto' ),
+					array( $this, 'do_hyperlink_url_no_uri_scheme' ),
 					$ret
 				);
 
-				// Link links that have an explicit protocol.
-				$protocol_regex =  '~
+				// Link links that have an explicit URI scheme.
+				$scheme_regex =  '~
 					(?!<.*?)                                           # Non-capturing check to ensure not matching what looks like the inside of an HTML tag.
 					(?<=[\s>.,:;!?])                                   # 1: Leading whitespace or character.
 					(\(?)                                              # Maybe an open parenthesis?
 					(                                                  # 2: Full URL
 						([\w]{1,20}?://)                               # 3: Scheme and hier-part prefix
-						(                                              # 4: URL minus protocol
+						(                                              # 4: URL minus URI scheme
 							(?=\S{1,2000}\s)                           # Limit to URLs less than about 2000 characters long
 							[\\w\\x80-\\xff#%\\~/@\\[\\]*(+=&$-]*+     # Non-punctuation URL character
 							(?:                                        # Unroll the Loop: Only allow puctuation URL character if followed by a non-punctuation URL character
@@ -405,7 +404,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 				~ixS';
 
 				$ret = preg_replace_callback(
-					$protocol_regex,
+					$scheme_regex,
 					array( $this, 'do_hyperlink_url' ),
 					$ret
 				);
@@ -521,13 +520,13 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 	}
 
 	/**
-	 * preg_replace_callback to create the replacement text for non-protocol
-	 * hyperlinks.
+	 * Callback to create the replacement text for hyperlinks without
+	 * URI scheme.
 	 *
 	 * @param  array  $matches Matches as generated by a preg_replace_callback().
 	 * @return string Replacement string
 	 */
-	public function do_hyperlink_url_no_proto( $matches ) {
+	public function do_hyperlink_url_no_uri_scheme( $matches ) {
 		$dest = $matches[2] . '.' . $matches[3] . $matches[4];
 
 		// Check to see if the link should actually be hyperlinked.
@@ -553,7 +552,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 	}
 
 	/**
-	 * preg_replace_callback to create the replacement text for emails.
+	 * Callback to create the replacement text for emails.
 	 *
 	 * @param  array  $matches Matches as generated by a preg_replace_callback().
 	 * @return string Replacement string.
