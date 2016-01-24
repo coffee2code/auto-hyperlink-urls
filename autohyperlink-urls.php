@@ -339,6 +339,33 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 	 * @return string The hyperlinked version of the text.
 	 */
 	public function hyperlink_urls( $text, $args = array() ) {
+		$r = '';
+		$textarr = preg_split( '/(<[^<>]+>)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE ); // split out HTML tags
+		$nested_code_pre = 0; // Keep track of how many levels link is nested inside <pre> or <code>
+		foreach ( $textarr as $piece ) {
+
+			if ( preg_match( '|^<code[\s>]|i', $piece ) || preg_match( '|^<pre[\s>]|i', $piece ) || preg_match( '|^<script[\s>]|i', $piece ) || preg_match( '|^<style[\s>]|i', $piece ) )
+				$nested_code_pre++;
+			elseif ( $nested_code_pre && ( '</code>' === strtolower( $piece ) || '</pre>' === strtolower( $piece ) || '</script>' === strtolower( $piece ) || '</style>' === strtolower( $piece ) ) )
+				$nested_code_pre--;
+
+			if ( $nested_code_pre || empty( $piece ) || ( $piece[0] === '<' && ! preg_match( '|^<\s*[\w]{1,20}+://|', $piece ) ) ) {
+				$r .= $piece;
+				continue;
+			}
+
+			// Long strings might contain expensive edge cases ...
+			if ( 10000 < strlen( $piece ) ) {
+				// ... break it up
+				foreach ( _split_str_by_whitespace( $piece, 2100 ) as $chunk ) { // 2100: Extra room for scheme and leading and trailing paretheses
+					if ( 2101 < strlen( $chunk ) ) {
+						$r .= $chunk; // Too big, no whitespace: bail.
+					} else {
+						$r .= $this->hyperlink_urls( $chunk, $args );
+					}
+				}
+			} else {
+
 		$options = $this->get_options();
 
 		if ( $args ) {
@@ -346,16 +373,16 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 		}
 
 		// Temporarily introduce a leading and trailing single space to the text to simplify regex handling.
-		$text = ' ' . $text . ' ';
+		$ret = " $piece ";
 
 		// Get the regex-style list of domain extensions that are acceptable for non-protocoled links.
 		$extensions = $this->get_tlds();
 
 		// Link links that don't have a protocol.
-		$text = preg_replace_callback(
+		$ret = preg_replace_callback(
 			"#(?!<.*?)([\s{}\(\)\[\]>,\'\";:])([a-z0-9]+[a-z0-9\-\.]*)\.($extensions)((?:[/\#?][^\s<{}\(\)\[\]]*[^\.,\s<{}\(\)\[\]]?)?)(?![^<>]*?>)#is",
 			array( $this, 'do_hyperlink_url_no_proto' ),
-			$text
+			$ret
 		);
 
 		// Link links that have an explicit protocol.
@@ -378,26 +405,32 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 			(?![^<>]*?>) # Check to ensure not within what looks like an HTML tag.
 		~ixS';
 
-		$text = preg_replace_callback(
+		$ret = preg_replace_callback(
 			$protocol_regex,
 			array( $this, 'do_hyperlink_url' ),
-			$text
+			$ret
 		);
 
 		// Link email addresses, if enabled to do so.
 		if ( $options['hyperlink_emails'] ) {
-			$text = preg_replace_callback(
+			$ret = preg_replace_callback(
 				'#(?!<.*?)([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})(?![^<>]*?>)#i',
 				array( $this, 'do_hyperlink_email' ),
-				$text
+				$ret
 			);
 		}
 
-		// Remove links within links
-		$text = preg_replace( "#(<a\s+[^>]+>)(.*)<a [^>]+>([^<]*)</a>([^>]*)</a>#iU", "$1$2$3$4</a>" , $text );
+		// Remove temporarily added leading and trailing single spaces.
+		$ret = substr( $ret, 1, -1 );
 
-		// Remove temporarily added leading and trailing single spaces before returning.
-		return substr( $text, 1, -1 );
+		$r .= $ret;
+
+			} // else
+
+		} //foreach
+
+		// Remove links within links
+		return preg_replace( "#(<a\s+[^>]+>)(.*)<a\s+[^>]+>([^<]*)</a>([^>]*)</a>#iU", "$1$2$3$4</a>" , $r );
 	}
 
 	/**
