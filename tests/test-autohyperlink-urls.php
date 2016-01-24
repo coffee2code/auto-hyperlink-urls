@@ -86,6 +86,61 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function data_script_and_style_tags_with_email() {
+		return array(
+			array(
+				'<code>test@example.com</code>',
+			),
+			array(
+				'<pre>test@example.com</pre>',
+			),
+			array(
+				'<code>aaa test@example.com bbb</code>',
+			),
+			array(
+				'<pre>aaa test@example.com bbb</pre>',
+			),
+			array(
+				'<script>test@example.com</script>',
+			),
+			array(
+				'<style>test@example.com</style>',
+			),
+			array(
+				'<script type="text/javascript">test@example.com/script>',
+			),
+			array(
+				'<style type="text/css">test@example.com</style>',
+			),
+		);
+	}
+
+	public function data_script_and_style_tags_with_non_scheme_url() {
+		return array(
+			array(
+				'<code>example.com</code>',
+			),
+			array(
+				'<code>aaa example.com bbb</code>',
+			),
+			array(
+				'<pre>example.com</pre>',
+			),
+			array(
+				'<script>example.com</script>',
+			),
+			array(
+				'<style>example.com</style>',
+			),
+			array(
+				'<script type="text/javascript">example.com/script>',
+			),
+			array(
+				'<style type="text/css">example.com</style>',
+			),
+		);
+	}
+
 
 	//
 	//
@@ -433,6 +488,13 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @dataProvider data_script_and_style_tags_with_non_scheme_url
+	 */
+	public function test_url_without_uri_scheme_in_code_tags( $tag ) {
+		$this->assertEquals( $tag, c2c_autohyperlink_link_urls( $tag ) );
+	}
+
 	/*
 	 * Email.
 	 */
@@ -484,6 +546,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 			c2c_autohyperlink_link_urls( $text )
 		);
 	}
+
 	public function test_does_not_autolink_email_in_tag_attribute() {
 		$text = '<a href="http://example.com" title="Or email me at test@example.com ok">visit me</a>';
 
@@ -492,6 +555,14 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 			c2c_autohyperlink_link_urls( $text )
 		);
 	}
+
+	/**
+	 * @dataProvider data_script_and_style_tags_with_email
+	 */
+	public function test_dont_link_script_and_style_tags_with_email( $tag ) {
+		$this->assertEquals( $tag, c2c_autohyperlink_link_urls( $tag ) );
+	}
+
 
 	/*
 	 * Setting: strip_protocol
