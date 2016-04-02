@@ -534,8 +534,9 @@ abstract class c2c_AutoHyperlinkURLs_Plugin_041 {
 			border-style:solid;
 			border-color:#dadada;
 			border-width:1px 0;
+			overflow: auto;
 		}
-		#c2c div {
+		#c2c div:first-child {
 			margin:0 auto;
 			padding:5px 40px 0 0;
 			width:45%;
@@ -927,6 +928,8 @@ HTML;
 		echo sprintf( __( 'This plugin brought to you by %s.', 'auto-hyperlink-urls' ), $c2c );
 		echo '<span><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6ARCFJ9TX3522" title="' . esc_attr__( 'Please consider a donation', 'auto-hyperlink-urls' ) . '">' .
 		__( 'Did you find this plugin useful?', 'auto-hyperlink-urls' ) . '</a></span>';
+		echo '</div>' . "\n";
+
 		echo '</div>' . "\n";
 	}
 
