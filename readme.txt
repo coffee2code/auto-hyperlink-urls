@@ -1,6 +1,6 @@
 === Auto-hyperlink URLs ===
 Contributors: coffee2code
-Donate link: http://coffee2code.com
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6ARCFJ9TX3522
 Tags: links, link, URLs, url, auto-link, hyperlink, make_clickable, coffee2code
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
