@@ -128,44 +128,63 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_041 {
 		$this->menu_name = __( 'Auto-hyperlink', 'auto-hyperlink-urls' );
 
 		$this->config = array(
-			'hyperlink_comments' => array( 'input' => 'checkbox', 'default' => true,
-				'label' => __( 'Auto-hyperlink comments?', 'auto-hyperlink-urls' ),
-				'help'  => __( 'Note that if disabled WordPress&#8217;s built-in hyperlinking function will still be performed, which links email addresses and text URLs with explicit URI schemes.', 'auto-hyperlink-urls' ),
+			'hyperlink_comments' => array(
+				'input'    => 'checkbox',
+				'default'  => true,
+				'label'    => __( 'Auto-hyperlink comments?', 'auto-hyperlink-urls' ),
+				'help'     => __( 'Note that if disabled WordPress&#8217;s built-in hyperlinking function will still be performed, which links email addresses and text URLs with explicit URI schemes.', 'auto-hyperlink-urls' ),
 			),
-			'hyperlink_emails' => array( 'input' => 'checkbox', 'default' => true,
-				'label' => __( 'Hyperlink email addresses?', 'auto-hyperlink-urls' )
+			'hyperlink_emails' => array(
+				'input'    => 'checkbox',
+				'default'  => true,
+				'label'    => __( 'Hyperlink email addresses?', 'auto-hyperlink-urls' ),
 			),
-			'strip_protocol' => array( 'input' => 'checkbox', 'default' => true,
-				'label' => __( 'Strip URI scheme?', 'auto-hyperlink-urls' ),
-				'help'  => sprintf(
-					__( 'Remove the <a href="%s">URI scheme</a> (i.e. \'http://\') from the displayed auto-hyperlinked link?', 'auto-hyperlink-urls' ),
+			'strip_protocol' => array(
+				'input'    => 'checkbox',
+				'default'  => true,
+				'label'    => __( 'Strip URI scheme?', 'auto-hyperlink-urls' ),
+				'help'     => sprintf(
+					__( 'Remove the <a href="%s">URI scheme</a> (i.e. "http://") from the displayed auto-hyperlinked link?', 'auto-hyperlink-urls' ),
 					'https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Conceptual_distinctions'
 				),
 			),
-			'open_in_new_window' => array( 'input' => 'checkbox', 'default' => false,
-				'label' => __( 'Open auto-hyperlinked links in new window?', 'auto-hyperlink-urls' )
+			'open_in_new_window' => array(
+				'input'    => 'checkbox',
+				'default'  => false,
+				'label'    => __( 'Open auto-hyperlinked links in new window?', 'auto-hyperlink-urls' ),
 			),
-			'nofollow' => array( 'input' => 'checkbox', 'default' => false,
-				'label' => sprintf( __( 'Enable <a href="%s">nofollow</a>?', 'auto-hyperlink-urls' ), 'http://en.wikipedia.org/wiki/Nofollow' ),
+			'nofollow' => array(
+				'input'    => 'checkbox',
+				'default'  => false,
+				'label'    => sprintf( __( 'Enable <a href="%s">nofollow</a>?', 'auto-hyperlink-urls' ), 'http://en.wikipedia.org/wiki/Nofollow' ),
 			),
-			'hyperlink_mode' => array( 'input' => 'shorttext', 'default' => 0,
-				'label' => __( 'Hyperlink Mode/Truncation', 'auto-hyperlink-urls' ),
-				'help' => __( 'This determines what text should appear as the link.  Use <code>0</code> to show the full URL, use <code>1</code> to show just the hostname, or use a value greater than <code>10</code> to indicate how many characters of the URL you want shown before it gets truncated.  <em>If</em> text gets truncated, the truncation before/after text values below will be used.', 'auto-hyperlink-urls' )
+			'hyperlink_mode' => array(
+				'input'    => 'shorttext',
+				'default'  => 0,
+				'label'    => __( 'Hyperlink Mode/Truncation', 'auto-hyperlink-urls' ),
+				'help'     => __( 'This determines what text should appear as the link.  Use <code>0</code> to show the full URL, use <code>1</code> to show just the hostname, or use a value greater than <code>10</code> to indicate how many characters of the URL you want shown before it gets truncated.  <em>If</em> text gets truncated, the truncation before/after text values below will be used.', 'auto-hyperlink-urls' ),
 			),
-			'truncation_before_text' => array( 'input' => 'text', 'default' => '',
-				'label' => __( 'Text to show before link truncation', 'auto-hyperlink-urls' )
+			'truncation_before_text' => array(
+				'input'    => 'text',
+				'default'  => '',
+				'label'    => __( 'Text to show before link truncation', 'auto-hyperlink-urls' ),
 			),
-			'truncation_after_text' => array( 'input' => 'text', 'default' => '...',
-				'label' => __( 'Text to show after link truncation', 'auto-hyperlink-urls' )
+			'truncation_after_text' => array(
+				'input'    => 'text',
+				'default'  => '...',
+				'label'    => __( 'Text to show after link truncation', 'auto-hyperlink-urls' ),
 			),
-			'more_extensions' => array( 'input' => 'text', 'default' => '',
-				'label' => __( 'Extra domain extensions', 'auto-hyperlink-urls' ),
-				'help'  => __( 'Space and/or comma-separated list of extensions/<acronym title="Top-Level Domains">TLDs</acronym>.<br />These are already built-in: com, org, net, gov, edu, mil, us, info, biz, ws, name, mobi, cc, tv', 'auto-hyperlink-urls' )
+			'more_extensions' => array( 'input' => 'text',
+				'default'  => '',
+				'label'    => __( 'Extra domain extensions', 'auto-hyperlink-urls' ),
+				'help'     => __( 'Space and/or comma-separated list of extensions/<acronym title="Top-Level Domains">TLDs</acronym>.<br />These are already built-in: com, org, net, gov, edu, mil, us, info, biz, ws, name, mobi, cc, tv', 'auto-hyperlink-urls' ),
 			),
-			'exclude_domains' => array( 'input' => 'inline_textarea', 'datatype' => 'array',
-				'no_wrap' => true, 'input_attributes' => 'rows="6"',
-				'label' => __( 'Exclude domains', 'auto-hyperlink-urls' ),
-				'help' => __( 'List domains that should NOT get automatically hyperlinked. One domain per line. Do not include URI scheme (e.g. "http://") or trailing slash.', 'auto-hyperlink-urls' ),
+			'exclude_domains' => array(
+				'input'    => 'inline_textarea',
+				'datatype' => 'array',
+				'no_wrap'  => true, 'input_attributes' => 'rows="6"',
+				'label'    => __( 'Exclude domains', 'auto-hyperlink-urls' ),
+				'help'     => __( 'List domains that should NOT get automatically hyperlinked. One domain per line. Do not include URI scheme (e.g. "http://") or trailing slash.', 'auto-hyperlink-urls' ),
 			),
 		);
 	}

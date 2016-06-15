@@ -241,6 +241,9 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 
 == Changelog ==
 
+= () =
+* Change: Minor code reformatting.
+
 = 5.0 (2016-01-26) =
 Highlights:
 This release revives active development of the plugin after many years and includes many, many changes. Backwards compatilibility has been maintained; it just handles things better and introduces a number of new features. Some notable changes:
