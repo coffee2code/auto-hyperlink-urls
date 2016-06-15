@@ -5,7 +5,7 @@ Tags: links, link, URLs, url, auto-link, hyperlink, make_clickable, coffee2code
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires at least: 4.1
-Tested up to: 4.4
+Tested up to: 4.5
 Stable tag: 5.0
 
 Automatically hyperlink text URLs and email addresses originally written only as plaintext.
@@ -243,6 +243,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 
 = () =
 * Change: Minor code reformatting.
+* Change: Note compatibility through WP 4.5+.
 * Bugfix: Add appropriate spacing so v5.0's changelog entry gets properly parsed.
 
 = 5.0 (2016-01-26) =
