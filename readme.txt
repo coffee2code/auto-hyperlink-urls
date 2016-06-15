@@ -243,10 +243,13 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 
 = () =
 * Change: Minor code reformatting.
+* Bugfix: Add appropriate spacing so v5.0's changelog entry gets properly parsed.
 
 = 5.0 (2016-01-26) =
 Highlights:
+
 This release revives active development of the plugin after many years and includes many, many changes. Backwards compatilibility has been maintained; it just handles things better and introduces a number of new features. Some notable changes:
+
 * Introduced setting and filter to support for preventing specified domains from getting auto-linked.
 * Introduced filter to support custom handlers to determine if and when text links should get auto-linked.
 * Improved text link detection and handling.
@@ -258,6 +261,7 @@ This release revives active development of the plugin after many years and inclu
 * Changed to no longer output the 'title' attribute.
 
 Details:
+
 * New: Introduce setting to allow specifying domains that should not be automatically hyperlinked.
 * New: Add filter 'autohyperlink_urls_exclude_domains' for specifying domains to exclude domains from hyperlinking.
 * New: Add filter 'autohyperlink_urls_custom_exclusions' to support custom logic to determine if a link should be hyperlinked.
