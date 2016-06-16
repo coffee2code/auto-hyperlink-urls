@@ -243,6 +243,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 
 = () =
 * Change: Minor code reformatting.
+* Change: Prevent web invocation of unit test bootstrap.php.
 * Change: Note compatibility through WP 4.5+.
 * Bugfix: Add appropriate spacing so v5.0's changelog entry gets properly parsed.
 
