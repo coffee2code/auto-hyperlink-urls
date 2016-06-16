@@ -199,11 +199,11 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	public function test_plugin_framework_class_name() {
-		$this->assertTrue( class_exists( 'c2c_AutoHyperlinkURLs_Plugin_041' ) );
+		$this->assertTrue( class_exists( 'c2c_AutoHyperlinkURLs_Plugin_044' ) );
 	}
 
 	public function test_plugin_framework_version() {
-		$this->assertEquals( '041', c2c_AutoHyperlinkURLs::get_instance()->c2c_plugin_version() );
+		$this->assertEquals( '044', c2c_AutoHyperlinkURLs::get_instance()->c2c_plugin_version() );
 	}
 
 	public function test_get_version() {
