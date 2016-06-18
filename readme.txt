@@ -256,6 +256,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
     * Update `disable_update_check()` to check for HTTP and HTTPS for plugin update check API URL.
     * Translate "Donate" in footer message.
     * Note compatibility through WP 4.5.
+* Change: Construct strings in a cleaner way with `sprintf()` rather than piecing strings and variables together.
 * Change: Minor code reformatting.
 * Change: Prevent web invocation of unit test bootstrap.php.
 * Change: Note compatibility through WP 4.5+.
