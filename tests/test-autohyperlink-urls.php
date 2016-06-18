@@ -897,12 +897,19 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_exclude_domains() {
 		$this->set_option( array( 'exclude_domains' => array( 'example.com') ) );
 
-		$text = 'example.com';
-
-		$this->assertEquals(
-			$text,
-			c2c_autohyperlink_link_urls( $text )
+		$texts = array(
+			'example.com',
+			'Visit example.com soon.',
+			'Visit Example.com soon.',
+			'Visit exAMPle.com soon.',
 		);
+
+		foreach ( $texts as $text ) {
+			$this->assertEquals(
+				$text,
+				c2c_autohyperlink_link_urls( $text )
+			);
+		}
 	}
 
 	/*
@@ -949,12 +956,18 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	public function test_filter_autohyperlink_urls_exclude_domains() {
 		add_filter( 'autohyperlink_urls_exclude_domains', array( $this, 'autohyperlink_urls_exclude_domains' ) );
 
-		$text = 'Visit example.com soon.';
-
-		$this->assertEquals(
-			$text,
-			c2c_autohyperlink_link_urls( $text )
+		$texts = array(
+			'Visit example.com soon.',
+			'Visit Example.com soon.',
+			'Visit exAMPle.com soon.',
 		);
+
+		foreach ( $texts as $text ) {
+			$this->assertEquals(
+				$text,
+				c2c_autohyperlink_link_urls( $text )
+			);
+		}
 	}
 
 	public function test_filter_autohyperlink_urls_custom_exclusions_recognizes_false() {
@@ -963,6 +976,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$texts = array(
 			'Visit example.com soon.',
 			'Visit http://example.com soon.',
+			'Visit exAMPle.com soon.',
 		);
 
 		foreach ( $texts as $text ) {
@@ -979,11 +993,13 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$before = array(
 			'Visit coffee2code.com soon.',
 			'Visit http://coffee2code.com soon.',
+			'Visit http://Coffee2Code.com soon.',
 		);
 
 		$expected = array(
 			'Visit <a href="http://coffee2code.com" class="autohyperlink">coffee2code.com</a> soon.',
 			'Visit <a href="http://coffee2code.com" class="autohyperlink">coffee2code.com</a> soon.',
+			'Visit <a href="http://Coffee2Code.com" class="autohyperlink">Coffee2Code.com</a> soon.',
 		);
 
 		foreach ( $before as $key => $text ) {

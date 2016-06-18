@@ -243,6 +243,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 
 = () =
 * New: Add setting to allow preventing plugin from auto-linking URIs without explicit schemes (i.e. 'http://').
+* Change: Make the comparison for domains against the exclude list case insensitive. Props mqudsi.
 * Change: Update plugin framework to 044:
     * 044
     * Add `reset_caches()` to clear caches and memoized data. Use it in `reset_options()` and `verify_config()`.

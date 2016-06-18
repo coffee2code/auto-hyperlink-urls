@@ -487,7 +487,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_044 {
 		// Don't link domains explicitly excluded.
 		$exclude_domains = (array) apply_filters( 'autohyperlink_urls_exclude_domains', $options['exclude_domains'] );
 		foreach ( $exclude_domains as $exclude ) {
-			if ( $domain === $exclude ) {
+			if ( strcasecmp( $domain, $exclude ) == 0 ) {
 				return false;
 			}
 		}
