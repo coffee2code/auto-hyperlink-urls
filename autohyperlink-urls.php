@@ -158,6 +158,12 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_044 {
 				'default'  => false,
 				'label'    => sprintf( __( 'Enable <a href="%s">nofollow</a>?', 'auto-hyperlink-urls' ), 'http://en.wikipedia.org/wiki/Nofollow' ),
 			),
+			'require_scheme' => array(
+				'input'    => 'checkbox',
+				'default'  => false,
+				'label'    => __( 'Require explicit URI scheme?', 'auto-hyperlink-urls' ),
+				'help'     => __( 'Only links with an explicit URI scheme (e.g. "http://", "https://") will be auto-hyperlinked.', 'auto-hyperlink-urls' ),
+			),
 			'hyperlink_mode' => array(
 				'input'    => 'shorttext',
 				'default'  => 0,
@@ -396,11 +402,13 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_044 {
 				$extensions = $this->get_tlds();
 
 				// Link links that don't have a URI scheme.
-				$ret = preg_replace_callback(
-					"#(?!<.*?)([\s{}\(\)\[\]>,\'\";:])([a-z0-9]+[a-z0-9\-\.]*)\.($extensions)((?:[/\#?][^\s<{}\(\)\[\]]*[^\.,\s<{}\(\)\[\]]?)?)(?![^<>]*?>)#is",
-					array( $this, 'do_hyperlink_url_no_uri_scheme' ),
-					$ret
-				);
+				if ( ! $options['require_scheme'] ) {
+					$ret = preg_replace_callback(
+						"#(?!<.*?)([\s{}\(\)\[\]>,\'\";:])([a-z0-9]+[a-z0-9\-\.]*)\.($extensions)((?:[/\#?][^\s<{}\(\)\[\]]*[^\.,\s<{}\(\)\[\]]?)?)(?![^<>]*?>)#is",
+						array( $this, 'do_hyperlink_url_no_uri_scheme' ),
+						$ret
+					);
+				}
 
 				// Link links that have an explicit URI scheme.
 				$scheme_regex =  '~

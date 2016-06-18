@@ -242,6 +242,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 == Changelog ==
 
 = () =
+* New: Add setting to allow preventing plugin from auto-linking URIs without explicit schemes (i.e. 'http://').
 * Change: Update plugin framework to 044:
     * 044
     * Add `reset_caches()` to clear caches and memoized data. Use it in `reset_options()` and `verify_config()`.

@@ -243,6 +243,11 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$this->assertFalse( $options['nofollow'] );
 	}
 
+	public function test_default_value_of_require_scheme() {
+		$options = c2c_AutoHyperlinkURLs::get_instance()->get_options();
+		$this->assertFalse( $options['require_scheme'] );
+	}
+
 	public function test_default_value_of_hyperlink_mode() {
 		$options = c2c_AutoHyperlinkURLs::get_instance()->get_options();
 		$this->assertEquals( 0, $options['hyperlink_mode'] );
@@ -654,6 +659,24 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 			$expected,
 			c2c_autohyperlink_link_urls( 'http://coffee2code.com/', array( 'nofollow' => true ) )
 		);
+	}
+
+	/*
+	 * Setting: require_scheme
+	 */
+
+	public function test_require_scheme_true() {
+		$this->set_option( array( 'require_scheme' => true ) );
+
+		$string = 'Visit coffee2code.com now!';
+
+		$this->assertEquals( $string, c2c_autohyperlink_link_urls( $string ) );
+	}
+
+	public function test_require_scheme_true_via_args() {
+		$string = 'Visit coffee2code.com now!';
+
+		$this->assertEquals( $string, c2c_autohyperlink_link_urls( $string, array( 'require_scheme' => true ) ) );
 	}
 
 	/*
