@@ -6,7 +6,7 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires at least: 4.1
 Tested up to: 4.5
-Stable tag: 5.0
+Stable tag: 5.1
 
 Automatically hyperlink text URLs and email addresses originally written only as plaintext.
 
@@ -241,8 +241,8 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 
 == Changelog ==
 
-= () =
-* New: Add setting to allow preventing plugin from auto-linking URIs without explicit schemes (i.e. 'http://').
+= 5.1 (2016-06-19) =
+* New: Add setting 'require_scheme' to allow preventing plugin from auto-linking URIs without explicit schemes (i.e. 'http://').
 * Change: Make the comparison for domains against the exclude list case insensitive. Props mqudsi.
 * Change: Update plugin framework to 044:
     * 044
@@ -268,7 +268,7 @@ Highlights:
 
 This release revives active development of the plugin after many years and includes many, many changes. Backwards compatilibility has been maintained; it just handles things better and introduces a number of new features. Some notable changes:
 
-* Introduced setting and filter to support for preventing specified domains from getting auto-linked.
+* Introduced setting and filter to add support for preventing specified domains from getting auto-linked.
 * Introduced filter to support custom handlers to determine if and when text links should get auto-linked.
 * Improved text link detection and handling.
 * Links within `<code>`, `<pre>`, `<script>`, and `<style>` tags are no longer hyperlinked.
@@ -448,6 +448,9 @@ Details:
 
 
 == Upgrade Notice ==
+
+= 5.1 =
+Feature release: added setting to require explicit URI scheme (e.g. "http://") for text to be auto-linked; made comparison for domains against the exclude list be case insensitive; verified compatibility through WP 4.5+.
 
 = 5.0 =
 Recommended major update: new features; improved handling; hardening; minor bug fixes; added unit tests; improved localization; verified compatibility through WP 4.4; minimum WP support now 4.1; updated copyright date (2016); and more.
