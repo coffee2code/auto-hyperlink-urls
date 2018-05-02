@@ -34,7 +34,7 @@ The following domain extensions (aka TLDs, Top-Level Domains) are recognized by 
 
 This plugin also activates auto-hyperlinking of text links within post/page content.
 
-Links: [Plugin Homepage](http://coffee2code.com/wp-plugins/auto-hyperlink-urls/) | [Plugin Directory Page](https://wordpress.org/plugins/auto-hyperlink-urls/) | [Author Homepage](http://coffee2code.com/)
+Links: [Plugin Homepage](http://coffee2code.com/wp-plugins/auto-hyperlink-urls/) | [Plugin Directory Page](https://wordpress.org/plugins/auto-hyperlink-urls/) | [GitHub](https://github.com/coffee2code/auto-hyperlink-urls/) | [Author Homepage](http://coffee2code.com/)
 
 
 == Installation ==
@@ -242,6 +242,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 == Changelog ==
 
 = () =
+* Change: Add GitHub link to readme
 * Change: Note compatibility through WP 4.9+
 * Change: Drop compatibility with versions of WP older than 4.7
 * Change: Update copyright date (2018)
