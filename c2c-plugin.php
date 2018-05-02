@@ -2,17 +2,17 @@
 /**
  * @package C2C_Plugins
  * @author  Scott Reilly
- * @version 044
+ * @version 047
  */
 /*
 Basis for other plugins.
 
-Compatible with WordPress 3.6+ through 4.5+.
+Compatible with WordPress 4.7 through 4.9+.
 
 */
 
 /*
-	Copyright (c) 2010-2016 by Scott Reilly (aka coffee2code)
+	Copyright (c) 2010-2018 by Scott Reilly (aka coffee2code)
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -31,9 +31,9 @@ Compatible with WordPress 3.6+ through 4.5+.
 
 defined( 'ABSPATH' ) or die();
 
-if ( ! class_exists( 'c2c_AutoHyperlinkURLs_Plugin_044' ) ) :
+if ( ! class_exists( 'c2c_AutoHyperlinkURLs_Plugin_047' ) ) :
 
-abstract class c2c_AutoHyperlinkURLs_Plugin_044 {
+abstract class c2c_AutoHyperlinkURLs_Plugin_047 {
 	protected $plugin_css_version = '009';
 	protected $options            = array();
 	protected $options_from_db    = '';
@@ -65,7 +65,7 @@ abstract class c2c_AutoHyperlinkURLs_Plugin_044 {
 	 * @since 040
 	 */
 	public function c2c_plugin_version() {
-		return '044';
+		return '047';
 	}
 
 	/**
@@ -133,14 +133,14 @@ abstract class c2c_AutoHyperlinkURLs_Plugin_044 {
 	 *
 	 * @since 036
 	 */
-	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'auto-hyperlink-urls' ), '036' ); }
+	public function __clone() { _doing_it_wrong( __FUNCTION__, __( 'Something went wrong.', 'auto-hyperlink-urls' ), '036' ); }
 
 	/**
 	 * A dummy magic method to prevent object from being unserialized
 	 *
 	 * @since 036
 	 */
-	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'auto-hyperlink-urls' ), '036' ); }
+	public function __wakeup() { _doing_it_wrong( __FUNCTION__, __( 'Something went wrong.', 'auto-hyperlink-urls' ), '036' ); }
 
 	/**
 	 * Returns the plugin's version.
@@ -152,13 +152,11 @@ abstract class c2c_AutoHyperlinkURLs_Plugin_044 {
 	}
 
 	/**
-	 * Handles installation tasks, such as ensuring plugin options are instantiated and saved to options table.
+	 * Handles installation tasks.
 	 *
 	 * This can be overridden.
 	 */
 	public function install() {
-		$this->options = $this->get_options();
-		update_option( $this->admin_options_name, $this->options );
 	}
 
 	/**
@@ -352,7 +350,18 @@ abstract class c2c_AutoHyperlinkURLs_Plugin_044 {
 	 */
 	public function reset_options() {
 		$this->reset_caches();
+
+		// If a setting has been saved to the database.
+		if ( $option = get_option( $this->admin_options_name ) ) {
+			// Unset the options (so that in get_options() the defaults are used).
+			foreach ( $this->get_option_names() as $opt ) {
+				unset( $this->options[ $opt ] );
+			}
+			update_option( $this->admin_options_name, $this->options );
+		}
+
 		$this->options = $this->get_options( false );
+
 		return $this->options;
 	}
 

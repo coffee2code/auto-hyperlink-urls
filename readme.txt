@@ -242,6 +242,18 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 == Changelog ==
 
 = () =
+* Change: Update plugin framework to 047
+    * 047:
+    * Don't save default setting values to database on install
+    * Change "Cheatin', huh?" error messages to "Something went wrong.", consistent with WP core
+    * Note compatibility through WP 4.9+
+    * Drop compatibility with version of WP older than 4.7
+    * 046:
+    * Fix `reset_options()` to reference instance variable `$options`
+    * Note compatibility through WP 4.7+
+    * Update copyright date (2017)
+    * 045:
+    * Ensure `reset_options()` resets values saved in the database
 * Change: Store setting name in constant
 * Change: Add GitHub link to readme
 * Change: Note compatibility through WP 4.9+
