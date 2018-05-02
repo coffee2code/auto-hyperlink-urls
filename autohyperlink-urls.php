@@ -8,7 +8,7 @@
  * Text Domain: auto-hyperlink-urls
  * Description: Automatically hyperlink text URLs and email addresses originally written only as plaintext.
  *
- * Compatible with WordPress 4.1 through 4.5+.
+ * Compatible with WordPress 4.7 through 4.9+.
  *
  * =>> Read the accompanying readme.txt file for instructions and documentation.
  * =>> Also, visit the plugin's homepage for additional information and updates.
