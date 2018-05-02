@@ -241,6 +241,9 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 
 == Changelog ==
 
+= () =
+* Change: Update copyright date (2018)
+
 = 5.1 (2016-06-19) =
 * New: Add setting 'require_scheme' to allow preventing plugin from auto-linking URIs without explicit schemes (i.e. 'http://').
 * Change: Make the comparison for domains against the exclude list case insensitive. Props mqudsi.
