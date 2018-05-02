@@ -242,6 +242,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 == Changelog ==
 
 = () =
+* Change: Reformat code (minor) for `hyperlink_urls()` to sync with core coding standards
 * Change: Update plugin framework to 047
     * 047:
     * Don't save default setting values to database on install

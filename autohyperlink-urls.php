@@ -365,20 +365,23 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 	/**
 	 * Hyperlinks plaintext links within text.
 	 *
+	 * @see make_clickable() in core, parts of which were adapted here.
+	 *
 	 * @param  string $text The text to have its plaintext links hyperlinked.
 	 * @param  array  $args An array of configuration options, each element of which will override the plugin's corresponding default setting.
 	 * @return string The hyperlinked version of the text.
 	 */
 	public function hyperlink_urls( $text, $args = array() ) {
-		$r = '';
-		$textarr = preg_split( '/(<[^<>]+>)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE ); // split out HTML tags
+		$r               = '';
+		$textarr         = preg_split( '/(<[^<>]+>)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE ); // split out HTML tags
 		$nested_code_pre = 0; // Keep track of how many levels link is nested inside <pre> or <code>
 		foreach ( $textarr as $piece ) {
 
-			if ( preg_match( '|^<code[\s>]|i', $piece ) || preg_match( '|^<pre[\s>]|i', $piece ) || preg_match( '|^<script[\s>]|i', $piece ) || preg_match( '|^<style[\s>]|i', $piece ) )
+			if ( preg_match( '|^<code[\s>]|i', $piece ) || preg_match( '|^<pre[\s>]|i', $piece ) || preg_match( '|^<script[\s>]|i', $piece ) || preg_match( '|^<style[\s>]|i', $piece ) ) {
 				$nested_code_pre++;
-			elseif ( $nested_code_pre && ( '</code>' === strtolower( $piece ) || '</pre>' === strtolower( $piece ) || '</script>' === strtolower( $piece ) || '</style>' === strtolower( $piece ) ) )
+			} elseif ( $nested_code_pre && ( '</code>' === strtolower( $piece ) || '</pre>' === strtolower( $piece ) || '</script>' === strtolower( $piece ) || '</style>' === strtolower( $piece ) ) ) {
 				$nested_code_pre--;
+			}
 
 			if ( $nested_code_pre || empty( $piece ) || ( $piece[0] === '<' && ! preg_match( '|^<\s*[\w]{1,20}+://|', $piece ) ) ) {
 				$r .= $piece;
@@ -434,7 +437,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 						)
 					)
 					(\)?)                                              # 5: Trailing closing parenthesis (for parethesis balancing post processing)
-					(?![^<>]*?>) # Check to ensure not within what looks like an HTML tag.
+					(?![^<>]*?>)                                       # Check to ensure not within what looks like an HTML tag.
 				~ixS';
 
 				$ret = preg_replace_callback(
