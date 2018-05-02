@@ -155,7 +155,7 @@ function add_title_attribute_for_autohyperlink_urls( $attributes, $context = 'ur
 
 	return $attributes;
 }
-add_filter( 'autohyperlink_urls_link_attributes', 'add_title_attribute_for_autohyperlink_urls' );
+add_filter( 'autohyperlink_urls_link_attributes', 'add_title_attribute_for_autohyperlink_urls', 10, 3 );
 `
 
 = autohyperlink_urls_tlds (filter) =
