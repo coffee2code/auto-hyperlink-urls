@@ -14,10 +14,10 @@ class Tests_Formatting_MakeClickable extends WP_UnitTestCase {
 	}
 
 	public function set_option( $settings = array() ) {
-		c2c_AutoHyperlinkURLs::get_instance()->load_config();
-		c2c_AutoHyperlinkURLs::get_instance()->verify_config();
-		$settings = wp_parse_args( $settings, c2c_AutoHyperlinkURLs::get_instance()->get_options() );
-		c2c_AutoHyperlinkURLs::get_instance()->update_option( $settings, true );
+		$obj = c2c_AutoHyperlinkURLs::get_instance();
+		$defaults = $obj->get_options();
+		$settings = wp_parse_args( (array) $settings, $defaults );
+		$obj->update_option( $settings, true );
 	}
 
 	public function remove_class_attribute_for_autohyperlink_urls( $attributes ) {
