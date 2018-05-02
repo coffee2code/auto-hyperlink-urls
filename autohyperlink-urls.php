@@ -55,6 +55,13 @@ require_once( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'c2c-plugin.php' );
 final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_044 {
 
 	/**
+	 * Name of plugin's setting.
+	 *
+	 * @var string
+	 */
+	const SETTING_NAME = 'c2c_autohyperlink_urls';
+
+	/**
 	 * The one true instance.
 	 *
 	 * @var c2c_AutoHyperlinkURLs
@@ -107,7 +114,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_044 {
 	 * @since 4.0
 	 */
 	public static function uninstall() {
-		delete_option( 'c2c_autohyperlink_urls' );
+		delete_option( self::SETTING_NAME );
 	}
 
 	/**

@@ -242,6 +242,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 == Changelog ==
 
 = () =
+* Change: Store setting name in constant
 * Change: Add GitHub link to readme
 * Change: Note compatibility through WP 4.9+
 * Change: Drop compatibility with versions of WP older than 4.7
