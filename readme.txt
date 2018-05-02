@@ -255,6 +255,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
     * Update copyright date (2017)
     * 045:
     * Ensure `reset_options()` resets values saved in the database
+* New: Add README.md
 * Change: Store setting name in constant
 * Change: Unit tests:
     * Revamp handling and testing of settings
