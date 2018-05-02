@@ -4,9 +4,12 @@ defined( 'ABSPATH' ) or die();
 
 class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 
+	public static function setUpBeforeClass() {
+		c2c_AutoHyperlinkURLs::get_instance()->install();
+	}
+
 	public function setUp() {
 		parent::setUp();
-		$this->set_option();
 	}
 
 	public function tearDown() {
@@ -1012,18 +1015,30 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	/*
-	 * Misc
+	 * Setting handling
 	 */
 
-	public function test_uninstall_deletes_option() {
-		$option = c2c_AutoHyperlinkURLs::SETTING_NAME;
-		c2c_AutoHyperlinkURLs::get_instance()->get_options();
+	public function test_does_not_immediately_store_default_settings_in_db() {
+		$option_name = c2c_AutoHyperlinkURLs::SETTING_NAME;
+		// Get the options just to see if they may get saved.
+		$options     = c2c_AutoHyperlinkURLs::get_instance()->get_options();
 
-		$this->assertNotFalse( get_option( $option ) );
+		$this->assertFalse( get_option( $option_name ) );
+	}
+
+	public function test_uninstall_deletes_option() {
+		$option_name = c2c_AutoHyperlinkURLs::SETTING_NAME;
+		$options     = c2c_AutoHyperlinkURLs::get_instance()->get_options();
+
+		// Explicitly set an option to ensure options get saved to the database.
+		$this->set_option( array( 'hyperlink_comments' => true ) );
+
+		$this->assertNotEmpty( $options );
+		$this->assertNotFalse( get_option( $option_name ) );
 
 		c2c_AutoHyperlinkURLs::uninstall();
 
-		$this->assertFalse( get_option( $option ) );
+		$this->assertFalse( get_option( $option_name ) );
 	}
 
 }
