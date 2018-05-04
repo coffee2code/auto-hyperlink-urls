@@ -486,6 +486,9 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 		// If domain wasn't provided, figure it out.
 		if ( ! $domain ) {
 			$parts = parse_url( $url );
+			if ( ! $parts || empty( $parts['host'] ) ) {
+				return false;
+			}
 			$domain = $parts['host'];
 		}
 
