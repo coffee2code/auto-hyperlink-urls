@@ -8,12 +8,12 @@ Requires at least: 4.7
 Tested up to: 4.9
 Stable tag: 5.1
 
-Automatically hyperlink text URLs and email addresses originally written only as plaintext.
+Automatically turns plaintext URLs and email addresses into links.
 
 
 == Description ==
 
-Automatically hyperlink text URLs and email addresses originally written only as plaintext.
+Automatically turns plaintext URLs and email addresses into links.
 
 This plugin seeks to replace and extend WordPress's default auto-hyperlinking function. This plugin uses different pattern matching expressions than the WordPress default in order to prevent inappropriate adjacent characters from becoming part of the link (as WordPress has improved over the years, nowadays this is just a few edge cases like text links that are braced or bracketed) and it prevents invalid URIs (i.e. http://blah) from becoming links.
 
@@ -266,6 +266,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
     * Add explicit tests for 'strip_protocol' set as true
     * Default `WP_TESTS_DIR` to `/tmp/wordpress-tests-lib` rather than erroring out if not defined via environment variable
     * Enable more error output for unit tests
+* Change: Tweak plugin description
 * Change: Add GitHub link to readme
 * Change: Modify formatting of hook name in readme to prevent being uppercased when shown in the Plugin Directory
 * Change: Note compatibility through WP 4.9+

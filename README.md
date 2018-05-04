@@ -1,6 +1,6 @@
 # Auto-hyperlink URLs
 
-A plugin for WordPress that automatically hyperlinks text URLs and email addresses originally written only as plaintext.
+A plugin for WordPress that automatically turns plaintext URLs and email addresses into links.
 
 This plugin is available in the WordPress Plugin Directory: https://wordpress.org/plugins/auto-hyperlink-urls/
 

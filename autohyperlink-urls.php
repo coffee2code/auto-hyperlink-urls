@@ -6,7 +6,7 @@
  * Author:      Scott Reilly
  * Author URI:  http://coffee2code.com/
  * Text Domain: auto-hyperlink-urls
- * Description: Automatically hyperlink text URLs and email addresses originally written only as plaintext.
+ * Description: Automatically turns plaintext URLs and email addresses into links.
  *
  * Compatible with WordPress 4.7 through 4.9+.
  *
