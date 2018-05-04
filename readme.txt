@@ -242,6 +242,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 == Changelog ==
 
 = () =
+* Fix: Fix and improve handling of parentheses in URLs
 * Fix: Prevent error when `can_do_hyperlink()` is passed an invalid URL
 * Change: Reformat code (minor) for `hyperlink_urls()` to sync with core coding standards
 * Change: Update plugin framework to 047

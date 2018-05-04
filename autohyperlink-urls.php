@@ -423,8 +423,8 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 				// Link links that have an explicit URI scheme.
 				$scheme_regex =  '~
 					(?!<.*?)                                           # Non-capturing check to ensure not matching what looks like the inside of an HTML tag.
-					(?<=[\s>.,:;!?])                                   # 1: Leading whitespace or character.
-					(\(?)                                              # Maybe an open parenthesis?
+					(?<=[\s>.,:;!?])                                   # Leading whitespace or character.
+					(\(?)                                              # 1: Maybe an open parenthesis?
 					(                                                  # 2: Full URL
 						([\w]{1,20}?://)                               # 3: Scheme and hier-part prefix
 						(                                              # 4: URL minus URI scheme
@@ -432,7 +432,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 							[\\w\\x80-\\xff#%\\~/@\\[\\]*(+=&$-]*+     # Non-punctuation URL character
 							(?:                                        # Unroll the Loop: Only allow puctuation URL character if followed by a non-punctuation URL character
 								[\'.,;:!?)]                            # Punctuation URL character
-								[\\w\\x80-\\xff#%\\~/@\\[\\]*(+=&$-]++ # Non-punctuation URL character
+								[\\w\\x80-\\xff#%\\~/@\\[\\]*()+=&$-]++ # Non-punctuation URL character
 							)*
 						)
 					)
@@ -516,27 +516,39 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 	 */
 	public function do_hyperlink_url( $matches ) {
 		$options = $this->get_options();
+
+		$url = $matches[2];
+
 		// Check to see if the link should actually be hyperlinked.
-		if ( ! $this->can_do_hyperlink( $matches[0] ) ) {
+		if ( ! $this->can_do_hyperlink( $url ) ) {
 			return $matches[0];
 		}
 
-		// Handle parentheses balancing.
-		$url = $matches[2];
-
-		if ( ')' == $matches[5] && strpos( $url, '(' ) ) {
-			// If the trailing character is a closing parethesis, and the URL has an opening parenthesis in it, add the closing parenthesis to the URL.
-			// Then we can let the parenthesis balancer do its thing below.
-			$url .= $matches[5];
-			$suffix = '';
-		} else {
-			$suffix = $matches[5];
+		// If an opening parenthesis was captured, but not a closing one, then check
+		// if the closing parenthesis is included as part of URL. If so, it and
+		// anything after should not be part of the URL.
+		if ( '(' === $matches[1] && empty( $matches[5] ) ) {
+			if ( false !== ( $pos = strrpos( $url, ')' ) ) ) {
+				$matches[5] = substr( $url, $pos );
+				$url = substr( $url, 0, $pos );
+			}
 		}
 
-		// Include parentheses in the URL only if paired
-		while ( substr_count( $url, '(' ) < substr_count( $url, ')' ) ) {
-			$suffix = strrchr( $url, ')' ) . $suffix;
-			$url = substr( $url, 0, strrpos( $url, ')' ) );
+		// If the URL has more closing parentheses than opening, then an extra
+		// parenthesis got errantly included as part of the URL, so exclude it.
+		// Note: This is most likely case, though edge cases definitely exist.
+		if ( substr_count( $url, '(' ) < substr_count( $url, ')' ) ) {
+			$pos = strrpos( $url, ')' );
+			$matches[5] = substr( $url, $pos ) . $matches[5];
+			$url = substr( $url, 0, $pos );
+		}
+
+		// If the link ends with punctuation, assume it wasn't meant to be part of
+		// the URL.
+		$last_char = substr( $url, -1 );
+		if ( in_array( $last_char, array( "'", '.', ',', ';', ':', '!', '?' ) ) ) {
+			$matches[5] = $last_char . $matches[5];
+			$url = substr( $url, 0, -1 );
 		}
 
 		$url = esc_url( $url );
@@ -552,7 +564,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 
 		return $matches[1]
 			. sprintf( '<a href="%s"%s>%s</a>', esc_url( $url ), rtrim( ' ' . $this->get_link_attributes( $url ) ), $this->truncate_link( $link_text ) )
-			. $suffix;
+			. $matches[5];
 	}
 
 	/**
