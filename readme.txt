@@ -87,7 +87,7 @@ And unless explicitly stated, the results are using default values (nofollow is 
 
 The plugin exposes seven filters for hooking. Typically, customizations utilizing these hooks would be put into your active theme's functions.php file, or used by another plugin.
 
-= c2c_autohyperlink_urls_filters (filter) =
+**c2c_autohyperlink_urls_filters (filter)**
 
 This hook allows you to customize which filters get processed by the plugin.
 
@@ -112,7 +112,7 @@ function my_c2c_autohyperlink_urls_filters( $filters ) {
 add_filter( 'c2c_autohyperlink_urls_filters', 'my_c2c_autohyperlink_urls_filters' );
 `
 
-= autohyperlink_urls_class (filter) =
+**autohyperlink_urls_class (filter)**
 
 This hook allows you to customize the class added to links created by the plugin.
 
@@ -127,7 +127,7 @@ Example:
 add_filter( 'autohyperlink_urls_class', function ( $class ) { return 'myclass'; } );
 `
 
-= autohyperlink_urls_link_attributes (filter) =
+**autohyperlink_urls_link_attributes (filter)**
 
 This hook allows you to add custom attributes to links created by the plugin.
 
@@ -158,7 +158,7 @@ function add_title_attribute_for_autohyperlink_urls( $attributes, $context = 'ur
 add_filter( 'autohyperlink_urls_link_attributes', 'add_title_attribute_for_autohyperlink_urls', 10, 3 );
 `
 
-= autohyperlink_urls_tlds (filter) =
+**autohyperlink_urls_tlds (filter)**
 
 This hook allows you to custom the list of supported TLDs for non-URI scheme link auto-hyperlinking. Note that the value sent to the hook includes the default TLDs plus those added via the 'more_extensions' setting. Also note that the TLDs are defined as a '|'-separated string.
 
@@ -173,7 +173,7 @@ Example:
 add_filter( 'autohyperlink_urls_tlds', function ( $tlds ) { return $tlds . '|in|io|tt'; } );
 `
 
-= autohyperlink_urls_truncate_link (filter) =
+**autohyperlink_urls_truncate_link (filter)**
 
 This hook allows you to custom how truncated links are displayed.
 
@@ -183,7 +183,7 @@ Arguments:
 * $original_url (string): The full, original URL.
 * $context (string): The context for the link. Either 'url' or 'email'. Default 'url'.
 
-= autohyperlink_urls_custom_exclusions (filter) =
+**autohyperlink_urls_custom_exclusions (filter)**
 
 This hook allows you to define custom logic to determine if a link should be hyperlinked.
 
@@ -214,7 +214,7 @@ function my_autohyperlink_urls_custom_exclusions( $should, $url, $domain ) {
 add_filter( 'autohyperlink_urls_custom_exclusions', 'my_autohyperlink_urls_custom_exclusions' );
 `
 
-= autohyperlink_urls_exclude_domains (filter) =
+**autohyperlink_urls_exclude_domains (filter)**
 
 This hook allows you to specify domains that should not get auto-hyperlinked. Note that the value sent to the hook includes the value of the 'exclude_domains' setting. Note that only the domain (without URI scheme or trailing slash) should be specified.
 
@@ -267,6 +267,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
     * Default `WP_TESTS_DIR` to `/tmp/wordpress-tests-lib` rather than erroring out if not defined via environment variable
     * Enable more error output for unit tests
 * Change: Add GitHub link to readme
+* Change: Modify formatting of hook name in readme to prevent being uppercased when shown in the Plugin Directory
 * Change: Note compatibility through WP 4.9+
 * Change: Drop compatibility with versions of WP older than 4.7
 * Change: Update copyright date (2018)
