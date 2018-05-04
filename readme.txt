@@ -260,6 +260,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 * New: Add README.md
 * Change: Store setting name in constant
 * Change: Unit tests:
+    * Sync changes to `Tests_Formatting_MakeClickable` with core's version (largely code formatting changes)
     * Revamp handling and testing of settings
     * Simplify implementations of `set_option()`
     * Default `WP_TESTS_DIR` to `/tmp/wordpress-tests-lib` rather than erroring out if not defined via environment variable
