@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Auto-hyperlink URLs
- * Version:     5.1
+ * Version:     5.2
  * Plugin URI:  http://coffee2code.com/wp-plugins/auto-hyperlink-urls/
  * Author:      Scott Reilly
  * Author URI:  http://coffee2code.com/
@@ -16,7 +16,7 @@
  *
  * @package Auto_Hyperlink_URLs
  * @author  Scott Reilly
- * @version 5.1
+ * @version 5.2
  */
 
 /*
@@ -93,7 +93,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 	 * Constructor.
 	 */
 	protected function __construct() {
-		parent::__construct( '5.1', 'autohyperlink-urls', 'c2c', __FILE__, array() );
+		parent::__construct( '5.2', 'autohyperlink-urls', 'c2c', __FILE__, array() );
 		register_activation_hook( __FILE__, array( __CLASS__, 'activation' ) );
 
 		return self::$instance = $this;

@@ -6,7 +6,7 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 5.1
+Stable tag: 5.2
 
 Automatically turns plaintext URLs and email addresses into links.
 
@@ -241,7 +241,13 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 
 == Changelog ==
 
-= () =
+= 5.2 (2018-05-03) =
+Highlights:
+
+* This release consists of fixes for some minor bugs, improved handling of URLs containing parentheses, drops compatibility with versions of WordPress older than 4.7, and some behind-the-scenes changes.
+
+Details:
+
 * Fix: Fix and improve handling of parentheses in URLs
 * Fix: Prevent error when `can_do_hyperlink()` is passed an invalid URL
 * Change: Reformat code (minor) for `hyperlink_urls()` to sync with core coding standards
@@ -268,6 +274,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
     * Enable more error output for unit tests
 * Change: Tweak plugin description
 * Change: Add GitHub link to readme
+* Change: Fix code example in readme
 * Change: Modify formatting of hook name in readme to prevent being uppercased when shown in the Plugin Directory
 * Change: Note compatibility through WP 4.9+
 * Change: Drop compatibility with versions of WP older than 4.7
@@ -480,6 +487,9 @@ Details:
 
 
 == Upgrade Notice ==
+
+= 5.2 =
+Recommended update: improved handling of parentheses in URLs; fixed some minor bugs; updated plugin framework to version 047; added README.md; compatibility is now with WP 4.7-4.9+; updated copyright date (2018).
 
 = 5.1 =
 Feature release: added setting to require explicit URI scheme (e.g. "http://") for text to be auto-linked; made comparison for domains against the exclude list be case insensitive; verified compatibility through WP 4.5+.
