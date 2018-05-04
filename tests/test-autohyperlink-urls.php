@@ -597,6 +597,26 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_strip_protocol_true() {
+		$this->set_option( array( 'strip_protocol' => true ) );
+
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink">coffee2code.com/</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code.com/' )
+		);
+	}
+
+	public function test_strip_protocol_true_via_args() {
+		$expected = '<a href="http://coffee2code.com/" class="autohyperlink">coffee2code.com/</a>';
+
+		$this->assertEquals(
+			$expected,
+			c2c_autohyperlink_link_urls( 'http://coffee2code.com/', array( 'strip_protocol' => true ) )
+		);
+	}
+
 	/*
 	 * Setting: open_in_new_window
 	 */

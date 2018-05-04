@@ -263,6 +263,7 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
     * Sync changes to `Tests_Formatting_MakeClickable` with core's version (largely code formatting changes)
     * Revamp handling and testing of settings
     * Simplify implementations of `set_option()`
+    * Add explicit tests for 'strip_protocol' set as true
     * Default `WP_TESTS_DIR` to `/tmp/wordpress-tests-lib` rather than erroring out if not defined via environment variable
     * Enable more error output for unit tests
 * Change: Add GitHub link to readme
