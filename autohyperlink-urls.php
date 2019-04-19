@@ -627,7 +627,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 	}
 } // end c2c_AutoHyperlinkURLs
 
-c2c_AutoHyperlinkURLs::get_instance();
+add_action( 'plugins_loaded', array( 'c2c_AutoHyperlinkURLs', 'get_instance' ) );
 
 endif; // end if !class_exists()
 
