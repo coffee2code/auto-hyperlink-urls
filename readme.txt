@@ -83,7 +83,7 @@ And unless explicitly stated, the results are using default values (nofollow is 
 `<a href="http://www.somelonghost.com/with/some/long/URL/that/might/mess/up/your/theme/and/is/unsightly.php" class="autohyperlink" rel="nofollow">[www.somelonghos...]</a>`
 
 
-== Filters ==
+== Hooks ==
 
 The plugin exposes seven filters for hooking. Typically, customizations utilizing these hooks would be put into your active theme's functions.php file, or used by another plugin.
 
