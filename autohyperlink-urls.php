@@ -467,7 +467,19 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_047 {
 		} //foreach
 
 		// Remove links within links
-		return preg_replace( "#(<a\s+[^>]+>)(.*)<a\s+[^>]+>([^<]*)</a>([^>]*)</a>#iU", "$1$2$3$4</a>" , $r );
+		return preg_replace(
+			'#'
+				. '(<a\s+[^>]+>)'    // 1: Opening link tag with any number of attributes
+				. '(.*)'             // 2: 0 or more characters
+				. '<a\s+[^>]+>'      // Embedded opening link tag with any number of attributes
+				. '([^<]*)'          // 3: Contents of the embedded link tag
+				. '</a>'             // Closing embedded link tag
+				. '([^>]*)'          // 4: 0 or more non-> characters
+				. '</a>'             // Closing link tag
+			. '#iU',
+			'$1$2$3$4</a>',
+			$r
+		);
 	}
 
 	/**

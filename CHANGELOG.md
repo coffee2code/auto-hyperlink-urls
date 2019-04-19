@@ -2,6 +2,7 @@
 
 ## _(in-progress)_
 * New: Add CHANGELOG.md file and move all but most recent changelog entries into it
+* New: Add inline comments to document each segment of the regex used for fixing embedded links
 * Change: Note compatibility through WP 5.1+
 * Change: Add 'License' and 'License URI' to plugin header
 * Change: Rename readme.txt section from 'Filters' to 'Hooks' and provide a better section intro
