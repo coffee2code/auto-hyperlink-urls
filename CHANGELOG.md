@@ -2,6 +2,7 @@
 
 ## _(in-progress)_
 * New: Add CHANGELOG.md file and move all but most recent changelog entries into it
+* Change: Update License URI to be HTTPS
 
 ## 5.2 _(2018-05-03)_
 
