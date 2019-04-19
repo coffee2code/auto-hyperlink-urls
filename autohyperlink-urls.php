@@ -6,6 +6,8 @@
  * Author:      Scott Reilly
  * Author URI:  http://coffee2code.com/
  * Text Domain: auto-hyperlink-urls
+ * License:     GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Description: Automatically turns plaintext URLs and email addresses into links.
  *
  * Compatible with WordPress 4.7 through 5.1+.
