@@ -6,6 +6,7 @@
 * Change: Add 'License' and 'License URI' to plugin header
 * Change: Update copyright date (2019)
 * Change: Update License URI to be HTTPS
+* Change: Split paragraph in README.md's "Support" section into two
 
 ## 5.2 _(2018-05-03)_
 
