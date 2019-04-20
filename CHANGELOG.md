@@ -18,7 +18,9 @@
 * New: Add CHANGELOG.md file and move all but most recent changelog entries into it
 * New: Add inline documentation for hooks
 * New: Add inline comments to document each segment of the regex used for fixing embedded links
-* New: Unit tests: Add some failing unit tests for known edge cases to be addressed later
+* Unit tests:
+     * New: Add some failing unit tests for known edge cases to be addressed later
+     * Change: Update unit test install script and bootstrap to use latest WP unit test repo
 * New: Add a bunch of TODO considerations
 * Change: Note compatibility through WP 5.1+
 * Change: Add 'License' and 'License URI' to plugin header
