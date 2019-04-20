@@ -190,7 +190,7 @@ This hook allows you to define custom logic to determine if a link should be hyp
 Arguments:
 
 * $should (bool): Should the link be hyperlinked? Default true.
-* $url (string): The full URL.
+* $url (string): The URL to be hyperlinked.
 * $domain (string): Just the domain/host part of the URL.
 
 Example:
