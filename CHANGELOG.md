@@ -2,6 +2,17 @@
 
 ## _(in-progress)_
 * Change: Initialize plugin on `plugins_loaded` action instead of on load
+* Change: Update plugin framework to 049
+    * 049:
+    * Correct last arg in call to `add_settings_field()` to be an array
+    * Wrap help text for settings in `label` instead of `p`
+    * Only use `label` for help text for checkboxes, otherwise use `p`
+    * Ensure a `textarea` displays as a block to prevent orphaning of subsequent help text
+    * Note compatibility through WP 5.1+
+    * Update copyright date (2019)
+    * 048:
+    * When resetting options, delete the option rather than setting it with default values
+    * Prevent double "Settings reset" admin notice upon settings reset
 * New: Add CHANGELOG.md file and move all but most recent changelog entries into it
 * New: Add inline comments to document each segment of the regex used for fixing embedded links
 * Change: Note compatibility through WP 5.1+
