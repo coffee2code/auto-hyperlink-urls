@@ -1,6 +1,13 @@
 # Changelog
 
-## _(in-progress)_
+## 5.3 _(2019-04-19)_
+
+### Highlights:
+
+This minor release improves some link handling, but mostly improves upon plugin internals.
+
+### Details:
+
 * Change: Linkify emails before URLs instead of after in order to avoid an email username potentially matching as a domain
 * Change: Tweak regex used for fixing links within links
 * Change: Initialize plugin on `plugins_loaded` action instead of on load

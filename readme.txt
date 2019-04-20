@@ -6,7 +6,7 @@ License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Requires at least: 4.7
 Tested up to: 5.1
-Stable tag: 5.2
+Stable tag: 5.3
 
 Automatically turns plaintext URLs and email addresses into links.
 
@@ -242,6 +242,42 @@ add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude
 
 == Changelog ==
 
+= 5.3 (2019-04-19) =
+Highlights:
+
+* This minor release improves some link handling and notes compatibility through WP 5.3+, but mostly improves upon plugin internals.
+
+Details:
+
+* Change: Linkify emails before URLs instead of after in order to avoid an email username potentially matching as a domain
+* Change: Tweak regex used for fixing links within links
+* Change: Initialize plugin on `plugins_loaded` action instead of on load
+* Change: Update plugin framework to 049
+    * 049:
+    * Correct last arg in call to `add_settings_field()` to be an array
+    * Wrap help text for settings in `label` instead of `p`
+    * Only use `label` for help text for checkboxes, otherwise use `p`
+    * Ensure a `textarea` displays as a block to prevent orphaning of subsequent help text
+    * Note compatibility through WP 5.1+
+    * Update copyright date (2019)
+    * 048:
+    * When resetting options, delete the option rather than setting it with default values
+    * Prevent double "Settings reset" admin notice upon settings reset
+* New: Add CHANGELOG.md file and move all but most recent changelog entries into it
+* New: Add inline documentation for hooks
+* New: Add inline comments to document each segment of the regex used for fixing embedded links
+* Unit tests:
+     * New: Add some failing unit tests for known edge cases to be addressed later
+     * Change: Update unit test install script and bootstrap to use latest WP unit test repo
+* New: Add a bunch of TODO considerations
+* Change: Note compatibility through WP 5.1+
+* Change: Add 'License' and 'License URI' to plugin header
+* Change: Rename readme.txt section from 'Filters' to 'Hooks' and provide a better section intro
+* Change: Update installation instruction to prefer built-in installer over .zip file
+* Change: Update copyright date (2019)
+* Change: Update License URI to be HTTPS
+* Change: Split paragraph in README.md's "Support" section into two
+
 = 5.2 (2018-05-03) =
 Highlights:
 
@@ -307,6 +343,9 @@ _Full changelog is available in [CHANGELOG.md](https://github.com/coffee2code/au
 
 
 == Upgrade Notice ==
+
+= 5.3 =
+Minor update: tweaked plugin initialization, updated plugin framework to v049, noted compatibility through WP 5.1+, created CHANGELOG.md to store historical changelog outside of readme.txt, and updated copyright date (2019).
 
 = 5.2 =
 Recommended update: improved handling of parentheses in URLs; fixed some minor bugs; updated plugin framework to version 047; added README.md; compatibility is now with WP 4.7-4.9+; updated copyright date (2018).
