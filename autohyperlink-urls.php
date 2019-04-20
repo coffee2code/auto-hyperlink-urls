@@ -196,7 +196,8 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 			'exclude_domains' => array(
 				'input'    => 'inline_textarea',
 				'datatype' => 'array',
-				'no_wrap'  => true, 'input_attributes' => 'rows="6"',
+				'no_wrap'  => true,
+				'input_attributes' => 'rows="6"',
 				'label'    => __( 'Exclude domains', 'auto-hyperlink-urls' ),
 				'help'     => __( 'List domains that should NOT get automatically hyperlinked. One domain per line. Do not include URI scheme (e.g. "http://") or trailing slash.', 'auto-hyperlink-urls' ),
 			),
@@ -238,7 +239,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	}
 
 	/**
-	 * Returns the class name(s) to be used for links created by Autohyperlinks.
+	 * Returns the class name(s) to be used for links created by Auto-hyperlinks.
 	 *
 	 * Default value is 'autohyperlink'. Can be filtered via the
 	 * 'autohyperlink_urls_class' filter.
@@ -257,7 +258,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	}
 
 	/**
-	 * Returns the link attributes to be used for links created by Autohyperlinks.
+	 * Returns the link attributes to be used for links created by Auto-hyperlinks.
 	 *
 	 * Utilizes plugin options to determine if attributes such as 'target' and
 	 * 'nofollow' should be used. Calls get_class() to determine the
