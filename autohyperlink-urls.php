@@ -27,6 +27,23 @@
  * - More tests (incl. testing filters)
  * - Ability to truncate middle of link http://domain.com/som...file.php (config options for
  *   # of chars for first part, # of chars for ending, and truncation string?)
+ * - Ability to link plain-text phone numbers.
+ *   See https://wordpress.org/support/topic/telephone-numbers-to-urls/
+ * - Ability to disable linking for non-protocoled links.
+ *   See https://wordpress.org/support/topic/more-option-please/
+ * - Ability to output icon denoting external links
+ *   See https://wordpress.org/support/topic/add-an-icon-for-external-links/
+ * - Ability to disable linking for a specific link. Could prefix link with special char,
+ *   e.g. !example.com or !http://example.com. A meta box could allow for explicit listing.
+ * - Consider using https://github.com/iamcal/lib_autolink to handle auto-linking.
+ * - Add support for Event Manager plugin
+ *   See https://wordpress.org/support/topic/support-events-managers-custom-post-types-events-and-locations/
+ *   See https://wordpress.org/support/topic/events-manager-23/
+ * - Add support for ACF plugin
+ *   See https://wordpress.org/support/topic/how-to-make-auto-link-work-with-custom-fields/
+ *   See https://wordpress.org/support/topic/the-plugin-doesnt-work-with-acf-plugin/
+ * - Don't link within `<code>` or `<pre>` tags
+ *   See https://wordpress.org/support/topic/about-new-version-50/
  */
 
 /*
