@@ -1,6 +1,7 @@
 # Changelog
 
 ## _(in-progress)_
+* Change: Linkify emails before URLs instead of after in order to avoid an email username potentially matching as a domain
 * Change: Initialize plugin on `plugins_loaded` action instead of on load
 * Change: Update plugin framework to 049
     * 049:

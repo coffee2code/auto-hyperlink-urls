@@ -451,6 +451,15 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 				// Get the regex-style list of domain extensions that are acceptable for links without URI scheme.
 				$extensions = $this->get_tlds();
 
+				// Link email addresses, if enabled to do so.
+				if ( $options['hyperlink_emails'] ) {
+					$ret = preg_replace_callback(
+						'#(?!<.*?)([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})(?![^<>]*?>)#i',
+						array( $this, 'do_hyperlink_email' ),
+						$ret
+					);
+				}
+
 				// Link links that don't have a URI scheme.
 				if ( ! $options['require_scheme'] ) {
 					$ret = preg_replace_callback(
@@ -485,15 +494,6 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 					array( $this, 'do_hyperlink_url' ),
 					$ret
 				);
-
-				// Link email addresses, if enabled to do so.
-				if ( $options['hyperlink_emails'] ) {
-					$ret = preg_replace_callback(
-						'#(?!<.*?)([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})(?![^<>]*?>)#i',
-						array( $this, 'do_hyperlink_email' ),
-						$ret
-					);
-				}
 
 				// Remove temporarily added leading and trailing single spaces.
 				$ret = substr( $ret, 1, -1 );

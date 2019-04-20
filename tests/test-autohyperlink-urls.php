@@ -529,6 +529,18 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$this->test_basic_email_autolinking( "user@example.{$tld}" );
 	}
 
+	public function test_autolink_email_with_username_that_contains_a_domain() {
+		$usernames = array( 'test.com', 'user+test.com', 'test.com+user', 'test.composer', 'test.mil', 'test.millard' );
+
+		foreach ( $usernames as $username ) {
+			$this->assertEquals(
+				'<a href="mailto:' . $username . '@example.com" class="autohyperlink">' . $username . '@example.com</a>',
+				c2c_autohyperlink_link_urls( $username . '@example.com' )
+			);
+		}
+	}
+
+
 	public function test_does_not_autolink_already_linked_email() {
 		$text = '<a href="mailto:test@example.com">test@example.com</a>';
 
