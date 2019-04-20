@@ -27,7 +27,6 @@
  * - More tests (incl. testing filters)
  * - Ability to truncate middle of link http://domain.com/som...file.php (config options for
  *   # of chars for first part, # of chars for ending, and truncation string?)
- * - Inline docs for all hooks.
  */
 
 /*
@@ -211,6 +210,11 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	public function register_filters() {
 		$options = $this->get_options();
 
+		/**
+		 * Filters the list of filters that get processed for auto-hyperlinking.
+		 *
+		 * @param array $filters The list of filters. Default ['the_content', 'the_excerpt', 'widget_text'].
+		 */
 		$filters = (array) apply_filters( 'c2c_autohyperlink_urls_filters', array( 'the_content', 'the_excerpt', 'widget_text' ) );
 		foreach( $filters as $filter ) {
 			add_filter( $filter, array( $this, 'hyperlink_urls' ), 9 );
@@ -242,6 +246,13 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	 * @return string Class to assign to link.
 	 */
 	public function get_class() {
+		/**
+		 * Filters the class name used for links created by Auto-hyperlinks.
+		 *
+		 * @since 3.5
+		 *
+		 * @param string $class The class name. Default 'autohyperlink'.
+		 */
 		return apply_filters( 'autohyperlink_urls_class', 'autohyperlink' );
 	}
 
@@ -276,6 +287,15 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 			}
 		}
 
+		/**
+		 * Filters the attributes used for links created by Auto-hyperlinks.
+		 *
+		 * @since 3.5
+		 *
+		 * @param array  $attributes The link attributes.
+		 * @param string $context    The context for the link. Either 'url' or 'email'. Default 'url'.
+		 * @param string $title      The text for the link's title attribute.
+		 */
 		$link_attributes = (array) apply_filters( 'autohyperlink_urls_link_attributes', $link_attributes, $context, $title );
 
 		// Assemble the attributes into a string.
@@ -312,6 +332,14 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 			}
 		}
 
+		/**
+		 * Filters the list of recognized TLDs for auto-linking.
+		 *
+		 * @since 3.5
+		 *
+		 * @param string $tlds The '|'-separated string of TLDs. Default
+		 *                     'com|org|net|gov|edu|mil|us|info|biz|ws|name|mobi|cc|tv'`.
+		 */
 		$tlds = apply_filters( 'autohyperlink_urls_tlds', self::$tlds );
 
 		// Sanitize TLDs for use in regex.
@@ -361,6 +389,15 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 			$url = substr( esc_url( $ourl ), 7 );
 		}
 
+		/**
+		 * Filters link truncation.
+		 *
+		 * @since 3.5
+		 *
+		 * @param string $url          The potentially truncated URL.
+		 * @param string $original_url The full, original URL.
+		 * @param string $context      The context for the link. Either 'url' or 'email'. Default 'url'.
+		 */
 		return apply_filters( 'autohyperlink_urls_truncate_link', $url, $original_url, $context );
 	}
 
@@ -506,13 +543,28 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 			$domain = $parts['host'];
 		}
 
-		// Allow custom exclusions from hyperlinking.
+		/**
+		 * Filters Allow custom exclusions from hyperlinking.
+		 *
+		 * @since 5.0
+		 *
+		 * @param bool   $autolink Should the link be hyperlinked? Default true.
+		 * @param string $url      The URL to be hyperlinked.
+		 * @param string $domain   The domain/host part of the URL.
+		 */
 		if ( ! (bool) apply_filters( 'autohyperlink_urls_custom_exclusions', true, $url, $domain ) ) {
 			return false;
 		}
 
-		// Don't link domains explicitly excluded.
+		/**
+		 * Filters domains that are explicitly excluded from getting auto-linked.
+		 *
+		 * @since 5.0
+		 *
+		 * @param array $excluded_domains The excluded domains.
+		 */
 		$exclude_domains = (array) apply_filters( 'autohyperlink_urls_exclude_domains', $options['exclude_domains'] );
+
 		foreach ( $exclude_domains as $exclude ) {
 			if ( strcasecmp( $domain, $exclude ) == 0 ) {
 				return false;

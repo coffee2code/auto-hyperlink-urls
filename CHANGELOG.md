@@ -14,6 +14,7 @@
     * When resetting options, delete the option rather than setting it with default values
     * Prevent double "Settings reset" admin notice upon settings reset
 * New: Add CHANGELOG.md file and move all but most recent changelog entries into it
+* New: Add inline documentation for hooks
 * New: Add inline comments to document each segment of the regex used for fixing embedded links
 * Change: Note compatibility through WP 5.1+
 * Change: Add 'License' and 'License URI' to plugin header
