@@ -18,6 +18,7 @@
 * New: Add CHANGELOG.md file and move all but most recent changelog entries into it
 * New: Add inline documentation for hooks
 * New: Add inline comments to document each segment of the regex used for fixing embedded links
+* New: Unit tests: Add some failing unit tests for known edge cases to be addressed later
 * Change: Note compatibility through WP 5.1+
 * Change: Add 'License' and 'License URI' to plugin header
 * Change: Rename readme.txt section from 'Filters' to 'Hooks' and provide a better section intro

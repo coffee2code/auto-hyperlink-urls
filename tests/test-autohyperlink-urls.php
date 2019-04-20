@@ -485,6 +485,16 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_does_not_autolink_within_links() {
+		$expected = array(
+			'My sites <a href="http://example.com/my-sites/">of example.com or http://example.com is known failure as of v5.2</a> dude?',
+		);
+
+		foreach ( $expected as $e ) {
+			$this->assertEquals( $e, c2c_autohyperlink_link_urls( $e ) );
+		}
+	}
+
 	public function test_url_without_uri_scheme_except_as_query_arg() {
 		$this->set_option( array( 'strip_protocol' => false ) );
 
@@ -495,6 +505,18 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 			$expected,
 			c2c_autohyperlink_link_urls( $text )
 		);
+	}
+
+	public function test_does_not_autolink_within_shortcode_tags() {
+		$expected = array(
+			'[code url="http://coffee2code.com"]some text[/code]',
+			'[code domain="coffee2code.com"]known failure as of v5.2[/code]',
+			'[code text="Learn my at coffee2code.com ok"]within shortcode attribute text[/code]',
+		);
+
+		foreach ( $expected as $e ) {
+			$this->assertEquals( $e, c2c_autohyperlink_link_urls( $e ) );
+		}
 	}
 
 	/**
