@@ -5,6 +5,7 @@
 * New: Add support for Advanced Custom Fields (ACF) plugin fields
     * Autolinks the following ACF field types: text, textarea, url, wysiwyg
     * Adds filter `c2c_autohyperlink_acf_urls_filters` for customizing which ACF-related filters to hook
+* New: Unit tests: Add tests to verify default hooks get hooked
 * Change: Note compatibility through WP 5.3+
 * Change: Minor tweaks to descriptions of functions in inline documentation
 * Change: Update copyright date (2020)

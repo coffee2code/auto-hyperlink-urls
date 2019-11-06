@@ -43,13 +43,6 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public static function get_comment_filters() {
-		return array(
-			array( 'get_comment_text' ),
-			array( 'get_comment_excerpt' ),
-		);
-	}
-
 	public static function get_protocols() {
 		return array(
 			array( 'http' ),
@@ -229,6 +222,17 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 
 	public function test_instance_object_is_returned() {
 		$this->assertTrue( is_a( c2c_AutoHyperlinkURLs::get_instance(), 'c2c_AutoHyperlinkURLs' ) );
+	}
+
+	/**
+	 * @dataProvider get_default_filters
+	 */
+	public function test_hooks_default_filters( $filter ) {
+		$this->assertEquals( 9, has_filter( $filter, array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ) ) );
+	}
+
+	public function test_hooks_comment_text() {
+		$this->assertEquals( 9, has_filter( 'comment_text', array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ) ) );
 	}
 
 	public function test_hooks_acf_filters() {
@@ -836,6 +840,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		// which would hyperlink the email address.
 		$expected = 'Comment containing example.com and <a href="mailto:user@example.com">user@example.com</a> that shoud not get linked.';
 
+		$this->assertFalse( has_filter( 'comment_text', array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ) ) );
 		$this->assertEquals(
 			wpautop( $expected ),
 			apply_filters( 'comment_text', $text )
