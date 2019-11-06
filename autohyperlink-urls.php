@@ -39,9 +39,6 @@
  * - Add support for Event Manager plugin
  *   See https://wordpress.org/support/topic/support-events-managers-custom-post-types-events-and-locations/
  *   See https://wordpress.org/support/topic/events-manager-23/
- * - Add support for ACF plugin
- *   See https://wordpress.org/support/topic/how-to-make-auto-link-work-with-custom-fields/
- *   See https://wordpress.org/support/topic/the-plugin-doesnt-work-with-acf-plugin/
  * - Don't link within `<code>` or `<pre>` tags
  *   See https://wordpress.org/support/topic/about-new-version-50/
  */
@@ -234,6 +231,19 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 		 * @param array $filters The list of filters. Default ['the_content', 'the_excerpt', 'widget_text'].
 		 */
 		$filters = (array) apply_filters( 'c2c_autohyperlink_urls_filters', array( 'the_content', 'the_excerpt', 'widget_text' ) );
+
+		// Support for Advanced Custom Fields plugin.
+		$acf_filters = (array) apply_filters( 'c2c_autohyperlink_acf_urls_filters', array(
+			'acf/format_value/type=text',
+			'acf/format_value/type=textarea',
+			'acf/format_value/type=url',
+			//'acf/format_value/type=wysiwyg',
+			'acf_the_content',
+		) );
+		foreach ( $acf_filters as $filter ) {
+			$filters[] = $filter;
+		}
+
 		foreach( $filters as $filter ) {
 			add_filter( $filter, array( $this, 'hyperlink_urls' ), 9 );
 		}

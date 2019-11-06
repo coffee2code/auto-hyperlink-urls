@@ -218,6 +218,19 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$this->assertTrue( is_a( c2c_AutoHyperlinkURLs::get_instance(), 'c2c_AutoHyperlinkURLs' ) );
 	}
 
+	public function test_hooks_acf_filters() {
+		$acf_filters = array(
+			'acf/format_value/type=text',
+			'acf/format_value/type=textarea',
+			'acf/format_value/type=url',
+			'acf_the_content',
+		);
+
+		foreach ( $acf_filters as $filter ) {
+			$this->assertEquals( 9, has_filter( $filter, array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ) ) );
+		}
+	}
+
 	/*
 	 * Setting defaults.
 	 */
