@@ -119,13 +119,16 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function data_script_and_style_tags_with_non_scheme_url() {
+	public function data_script_and_style_tags_with_url() {
 		return array(
 			array(
 				'<code>example.com</code>',
 			),
 			array(
 				'<code>aaa example.com bbb</code>',
+			),
+			array(
+				'<code>This has a URL http://example.com, ok.</code>',
 			),
 			array(
 				'<pre>example.com</pre>',
@@ -543,7 +546,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_script_and_style_tags_with_non_scheme_url
+	 * @dataProvider data_script_and_style_tags_with_url
 	 */
 	public function test_url_without_uri_scheme_in_code_tags( $tag ) {
 		$this->assertEquals( $tag, c2c_autohyperlink_link_urls( $tag ) );
