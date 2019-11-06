@@ -264,6 +264,39 @@ function my_autohyperlink_urls_exclude_domains( $excluded_domains ) {
 add_filter( 'autohyperlink_urls_exclude_domains', 'my_autohyperlink_urls_exclude_domains' );
 `
 
+**autohyperlink_no_autolink_content_tags (filter)**
+
+This hook allows you to specify which HTML tags won't get their content autolinked.
+
+Arguments:
+
+* $html_tags (array): The HTML tags that won't get autolinked. Default `[ 'code', 'pre', 'script', 'style' ]`.
+
+Example:
+
+`
+/**
+ * Allow text within the `pre` to get autolinked, but don't allow text within
+ * `blockquote` to get autolinked.
+ *
+ * @param  array $html_tags The HTML tags not to autolink.
+ * @return array
+ */
+function my_autohyperlink_no_autolink_content_tags( $html_tags ) {
+		// Tag that should get content autolinked, but that would otherwise be by default.
+		$html_tags = array_flip( $html_tags );
+		unset( $html_tags['pre'] );
+		$html_tags = array_flip( $html_tags );
+
+		// Tag that should not get content autolinked.
+		$html_tags[] = 'blockquote';
+
+		return $html_tags;
+}
+add_filter( 'autohyperlink_no_autolink_content_tags', 'my_autohyperlink_no_autolink_content_tags' );
+`
+
+
 == Changelog ==
 
 = 5.3 (2019-04-19) =

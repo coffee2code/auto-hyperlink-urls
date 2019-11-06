@@ -1,6 +1,7 @@
 # Changelog
 
 ## _(in-progress)_
+* New: Add filter `autohyperlink_no_autolink_content_tags` for configuring which HTML tags don't get their content autolinked
 * New: Add support for Advanced Custom Fields (ACF) plugin fields
     * Autolinks the following ACF field types: text, textarea, url, wysiwyg
     * Adds filter `c2c_autohyperlink_acf_urls_filters` for customizing which ACF-related filters to hook

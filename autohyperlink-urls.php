@@ -441,12 +441,13 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	public function hyperlink_urls( $text, $args = array() ) {
 		$r               = '';
 		$textarr         = preg_split( '/(<[^<>]+>)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE ); // split out HTML tags
-		$nested_code_pre = 0; // Keep track of how many levels link is nested inside <pre> or <code>
+		$nested_code_pre = 0; // Keep track of how many levels link is nested inside tags
 		foreach ( $textarr as $piece ) {
+			$no_content_autolink = (array) apply_filters( 'autohyperlink_no_autolink_content_tags', array( 'code', 'pre', 'script', 'style' ) );
 
-			if ( preg_match( '|^<code[\s>]|i', $piece ) || preg_match( '|^<pre[\s>]|i', $piece ) || preg_match( '|^<script[\s>]|i', $piece ) || preg_match( '|^<style[\s>]|i', $piece ) ) {
+			if ( preg_match( '#^<(' . implode( '|', array_map( 'preg_quote', $no_content_autolink ) )  . ')[\s>]#i', $piece ) ) {
 				$nested_code_pre++;
-			} elseif ( $nested_code_pre && ( '</code>' === strtolower( $piece ) || '</pre>' === strtolower( $piece ) || '</script>' === strtolower( $piece ) || '</style>' === strtolower( $piece ) ) ) {
+			} elseif ( $nested_code_pre && in_array( substr( strtolower( $piece ), 2, -1 ), $no_content_autolink ) ) {
 				$nested_code_pre--;
 			}
 

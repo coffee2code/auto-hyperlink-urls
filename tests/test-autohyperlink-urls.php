@@ -24,6 +24,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		remove_filter( 'autohyperlink_urls_tlds',              array( $this, 'autohyperlink_urls_tlds' ) );
 		remove_filter( 'autohyperlink_urls_exclude_domains',   array( $this, 'autohyperlink_urls_exclude_domains' ) );
 		remove_filter( 'autohyperlink_urls_custom_exclusions', array( $this, 'autohyperlink_urls_custom_exclusions' ), 10, 3 );
+		remove_filter( 'autohyperlink_no_autolink_content_tags', array( $this, 'autohyperlink_no_autolink_content_tags' ) );
 	}
 
 
@@ -190,6 +191,15 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		return ! ( 'e' ===  $domain[0] );
 	}
 
+	public function autohyperlink_no_autolink_content_tags( $tags ) {
+		$tags = array_flip( $tags );
+		unset( $tags['pre'] );
+		$tags = array_flip( $tags );
+
+		$tags[] = 'blockquote';
+
+		return $tags;
+	}
 
 	//
 	//
@@ -1079,6 +1089,20 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 				c2c_autohyperlink_link_urls( $text )
 			);
 		}
+	}
+
+	public function test_filter_autohyperlink_no_autolink_content_tags() {
+		add_filter( 'autohyperlink_no_autolink_content_tags', array( $this, 'autohyperlink_no_autolink_content_tags' ) );
+
+		// Check that a default tag that wouldn't get autolinked now gets autolinked thanks to filter.
+		$this->assertEquals(
+			'<pre>This URL <a href="http://coffee2code.com" class="autohyperlink">coffee2code.com</a> should get linked now.</pre>',
+			c2c_autohyperlink_link_urls( '<pre>This URL http://coffee2code.com should get linked now.</pre>' )
+		);
+
+		// Check that a tag that would get autolinked now won't get autolinked thanks to filter.
+		$not_linked = '<blockquote>This URL http://coffee2code.com should get linked now</blockquote>';
+		$this->assertEquals( $not_linked, c2c_autohyperlink_link_urls( $not_linked ) );
 	}
 
 	/*
