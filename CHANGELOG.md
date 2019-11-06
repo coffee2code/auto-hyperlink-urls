@@ -2,6 +2,7 @@
 
 ## _(in-progress)_
 * Change: Note compatibility through WP 5.3+
+* Change: Update copyright date (2020)
 
 
 ## 5.3 _(2019-04-19)_
