@@ -485,7 +485,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_does_not_autolink_within_links() {
+	public function test_does_not_autolink_within_links_KNOWN_FAILURE() {
 		$expected = array(
 			'My sites <a href="http://example.com/my-sites/">of example.com or http://example.com is known failure as of v5.2</a> dude?',
 		);
@@ -507,7 +507,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_does_not_autolink_within_shortcode_tags() {
+	public function test_does_not_autolink_within_shortcode_tags_KNOWN_FAILURE() {
 		$expected = array(
 			'[code url="http://coffee2code.com"]some text[/code]',
 			'[code domain="coffee2code.com"]known failure as of v5.2[/code]',
