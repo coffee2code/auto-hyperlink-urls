@@ -6,7 +6,7 @@ License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Requires at least: 4.7
 Tested up to: 5.3
-Stable tag: 5.3
+Stable tag: 5.4
 
 Automatically turns plaintext URLs and email addresses into links.
 
@@ -299,6 +299,22 @@ add_filter( 'autohyperlink_no_autolink_content_tags', 'my_autohyperlink_no_autol
 
 == Changelog ==
 
+= 5.4 (2019-11-07) =
+Highlights:
+
+* This release adds support for the Advanced Custom Fields plugin, adds a filter to customize whith HTML tags get excluded from auto-linkification, notes compatibility through WP 5.3.
+
+Details:
+
+* New: Add filter `autohyperlink_no_autolink_content_tags` for configuring which HTML tags don't get their content autolinked
+* New: Add support for Advanced Custom Fields (ACF) plugin fields
+    * Autolinks the following ACF field types: text, textarea, url, wysiwyg
+    * Adds filter `c2c_autohyperlink_urls_acf_filters` for customizing which ACF-related filters to hook
+* New: Unit tests: Add tests to verify default hooks get hooked
+* Change: Note compatibility through WP 5.3+
+* Change: Minor tweaks to descriptions of functions in inline documentation
+* Change: Update copyright date (2020)
+
 = 5.3 (2019-04-19) =
 Highlights:
 
@@ -374,32 +390,13 @@ Details:
 * Change: Drop compatibility with versions of WP older than 4.7
 * Change: Update copyright date (2018)
 
-= 5.1 (2016-06-19) =
-* New: Add setting 'require_scheme' to allow preventing plugin from auto-linking URIs without explicit schemes (i.e. 'http://').
-* Change: Make the comparison for domains against the exclude list case insensitive. Props mqudsi.
-* Change: Update plugin framework to 044:
-    * 044
-    * Add `reset_caches()` to clear caches and memoized data. Use it in `reset_options()` and `verify_config()`.
-    * Add `verify_options()` with logic extracted from `verify_config()` for initializing default option attributes.
-    * Add  `add_option()` to add a new option to the plugin's configuration.
-    * Add filter 'sanitized_option_names' to allow modifying the list of whitelisted option names.
-    * Change: Refactor `get_option_names()`.
-    * 043
-    * Disregard invalid lines supplied as part of hash option value.
-    * 042
-    * Update `disable_update_check()` to check for HTTP and HTTPS for plugin update check API URL.
-    * Translate "Donate" in footer message.
-    * Note compatibility through WP 4.5.
-* Change: Construct strings in a cleaner way with `sprintf()` rather than piecing strings and variables together.
-* Change: Minor code reformatting.
-* Change: Prevent web invocation of unit test bootstrap.php.
-* Change: Note compatibility through WP 4.5+.
-* Bugfix: Add appropriate spacing so v5.0's changelog entry gets properly parsed.
-
 _Full changelog is available in [CHANGELOG.md](https://github.com/coffee2code/auto-hyperlink-urls/blob/master/CHANGELOG.md)._
 
 
 == Upgrade Notice ==
+
+= 5.4 =
+Feature update: added support for the Advanced Custom Fields plugin, added a filter to customize whith HTML tags get excluded from auto-linkification, noted compatibility through WP 5.3, and updated copyright date (2020).
 
 = 5.3 =
 Minor update: tweaked plugin initialization, updated plugin framework to v049, noted compatibility through WP 5.1+, created CHANGELOG.md to store historical changelog outside of readme.txt, and updated copyright date (2019).

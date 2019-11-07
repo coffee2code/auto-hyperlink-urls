@@ -1,6 +1,13 @@
 # Changelog
 
-## _(in-progress)_
+## 5.4 _(2019-11-07)_
+
+### Highlights:
+
+This release adds support for the Advanced Custom Fields plugin, adds a filter to customize whith HTML tags get excluded from auto-linkification, notes compatibility through WP 5.3.
+
+### Details:
+
 * New: Add filter `autohyperlink_no_autolink_content_tags` for configuring which HTML tags don't get their content autolinked
 * New: Add support for Advanced Custom Fields (ACF) plugin fields
     * Autolinks the following ACF field types: text, textarea, url, wysiwyg
