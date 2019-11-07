@@ -43,6 +43,15 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public static function get_acf_filters() {
+		return array(
+			array( 'acf/format_value/type=text' ),
+			array( 'acf/format_value/type=textarea' ),
+			array( 'acf/format_value/type=url' ),
+			array( 'acf_the_content' ),
+		);
+	}
+
 	public static function get_protocols() {
 		return array(
 			array( 'http' ),
@@ -197,6 +206,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		return $tags;
 	}
 
+
 	//
 	//
 	// TESTS
@@ -235,17 +245,11 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 		$this->assertEquals( 9, has_filter( 'comment_text', array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ) ) );
 	}
 
-	public function test_hooks_acf_filters() {
-		$acf_filters = array(
-			'acf/format_value/type=text',
-			'acf/format_value/type=textarea',
-			'acf/format_value/type=url',
-			'acf_the_content',
-		);
-
-		foreach ( $acf_filters as $filter ) {
-			$this->assertEquals( 9, has_filter( $filter, array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ) ) );
-		}
+	/**
+	 * @dataProvider get_acf_filters
+	 */
+	public function test_hooks_acf_filters( $filter ) {
+		$this->assertEquals( 9, has_filter( $filter, array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ) ) );
 	}
 
 	/*

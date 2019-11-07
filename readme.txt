@@ -113,13 +113,13 @@ function my_c2c_autohyperlink_urls_filters( $filters ) {
 add_filter( 'c2c_autohyperlink_urls_filters', 'my_c2c_autohyperlink_urls_filters' );
 `
 
-**c2c_autohyperlink_acf_urls_filters (filter)**
+**c2c_autohyperlink_urls_acf_filters (filter)**
 
-This hook allows you to customize which Advanced Custom Field filters get processed by the plugin.
+This hook allows you to customize which Advanced Custom Field filters get processed by the plugin. Note: the results of this filter are then passed through the `c2c_autohyperlink_urls_filters` filter, so ACF-specific filters can be modified using either hook.
 
 Arguments:
 
-* $filters (array): The filters whose text should be auto-hyperlinked. Default `array( 'acf/format_value/type=text', 'acf/format_value/type=textarea', 'acf/format_value/type=url', 'acf_the_content' )`.
+* $filters (array): The ACF-related filters whose text should be auto-hyperlinked. Default `array( 'acf/format_value/type=text', 'acf/format_value/type=textarea', 'acf/format_value/type=url', 'acf_the_content' )`.
 
 Example:
 
@@ -130,11 +130,11 @@ Example:
  * @param array $filters
  * @return array
  */
-function my_c2c_autohyperlink_acf_urls_filters( $filters ) {
+function my_c2c_autohyperlink_urls_acf_filters( $filters ) {
 	unset( $filters[ 'acf/format_value/type=text' ] );
 	return $filters;
 }
-add_filter( 'c2c_autohyperlink_acf_urls_filters', 'my_c2c_autohyperlink_acf_urls_filters' );
+add_filter( 'c2c_autohyperlink_urls_acf_filters', 'my_c2c_autohyperlink_urls_acf_filters' );
 `
 
 **autohyperlink_urls_class (filter)**

@@ -225,24 +225,24 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	public function register_filters() {
 		$options = $this->get_options();
 
-		/**
-		 * Filters the list of filters that get processed for auto-hyperlinking.
-		 *
-		 * @param array $filters The list of filters. Default ['the_content', 'the_excerpt', 'widget_text'].
-		 */
-		$filters = (array) apply_filters( 'c2c_autohyperlink_urls_filters', array( 'the_content', 'the_excerpt', 'widget_text' ) );
-
 		// Support for Advanced Custom Fields plugin.
-		$acf_filters = (array) apply_filters( 'c2c_autohyperlink_acf_urls_filters', array(
+		$filters = (array) apply_filters( 'c2c_autohyperlink_urls_acf_filters', array(
 			'acf/format_value/type=text',
 			'acf/format_value/type=textarea',
 			'acf/format_value/type=url',
 			//'acf/format_value/type=wysiwyg',
 			'acf_the_content',
 		) );
-		foreach ( $acf_filters as $filter ) {
-			$filters[] = $filter;
-		}
+
+		// Add in relevant stock WP filters.
+		$filters = array_merge( $filters, array( 'the_content', 'the_excerpt', 'widget_text' ) );
+
+		/**
+		 * Filters the list of filters that get processed for auto-hyperlinking.
+		 *
+		 * @param array $filters The list of filters. Default ['the_content', 'the_excerpt', 'widget_text'].
+		 */
+		$filters = (array) apply_filters( 'c2c_autohyperlink_urls_filters', $filters );
 
 		foreach( $filters as $filter ) {
 			add_filter( $filter, array( $this, 'hyperlink_urls' ), 9 );
