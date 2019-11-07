@@ -225,7 +225,21 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	public function register_filters() {
 		$options = $this->get_options();
 
-		// Support for Advanced Custom Fields plugin.
+		/**
+		 * Filters Advanced Custom Field hooks that get processed for auto-
+		 * linkification.
+		 *
+		 * Supported hooks:
+		 *    'acf/format_value/type=text',
+		 *    'acf/format_value/type=textarea',
+		 *    'acf/format_value/type=url',
+		 *    'acf_the_content',
+		 *
+		 * @since 3.9
+		 *
+		 * @param array $filters The ACF filters that get processed for auto-
+		 *                       linkification. See filter inline docs for defaults.
+		 */
 		$filters = (array) apply_filters( 'c2c_autohyperlink_urls_acf_filters', array(
 			'acf/format_value/type=text',
 			'acf/format_value/type=textarea',
@@ -443,6 +457,15 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 		$textarr         = preg_split( '/(<[^<>]+>)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE ); // split out HTML tags
 		$nested_code_pre = 0; // Keep track of how many levels link is nested inside tags
 		foreach ( $textarr as $piece ) {
+			/**
+			 * Filters the HTML tags the contents of which will be excluded from
+			 * auto-linkification.
+			 *
+			 * @since 5.4
+			 *
+			 * @param $tags array Array of HTML tags. Default ['code', 'pre',
+			 *                    'script', 'style'].
+			 */
 			$no_content_autolink = (array) apply_filters( 'autohyperlink_no_autolink_content_tags', array( 'code', 'pre', 'script', 'style' ) );
 
 			if ( preg_match( '#^<(' . implode( '|', array_map( 'preg_quote', $no_content_autolink ) )  . ')[\s>]#i', $piece ) ) {
