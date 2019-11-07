@@ -39,8 +39,10 @@
  * - Add support for Event Manager plugin
  *   See https://wordpress.org/support/topic/support-events-managers-custom-post-types-events-and-locations/
  *   See https://wordpress.org/support/topic/events-manager-23/
- * - Don't link within `<code>` or `<pre>` tags
- *   See https://wordpress.org/support/topic/about-new-version-50/
+ * - Add setting to disable ACF support? (Can already be done via filters.)
+ * - Add setting to specify additional filters to be handled by the plugin
+ *   Re: https://wordpress.org/support/topic/it-doesnt-work-226/
+ * - Default protocol-less URLs to 'https' instead of 'http' (possible controlled by setting)
  */
 
 /*
