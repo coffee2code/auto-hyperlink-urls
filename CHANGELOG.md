@@ -1,6 +1,7 @@
 # Changelog
 
 ## _(in-progress)_
+* Change: Disable Advanced Custom Field (ACF) support by default
 * Fix: Fix typo in changelog for v5.4
 
 ## 5.4 _(2019-11-07)_

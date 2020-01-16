@@ -249,7 +249,17 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	 * @dataProvider get_acf_filters
 	 */
 	public function test_hooks_acf_filters( $filter ) {
+		$this->set_option( array( 'enable_3p_advanced_custom_fields' => true ) );
+		c2c_AutoHyperlinkURLs::get_instance()->register_filters();
+
 		$this->assertEquals( 9, has_filter( $filter, array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ) ) );
+	}
+
+	/**
+	 * @dataProvider get_acf_filters
+	 */
+	public function test_does_not_hook_acf_filters_by_default( $filter ) {
+		$this->assertFalse( has_filter( $filter, array( c2c_AutoHyperlinkURLs::get_instance(), 'hyperlink_urls' ) ) );
 	}
 
 	/*

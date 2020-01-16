@@ -217,6 +217,11 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 				'label'    => __( 'Exclude domains', 'auto-hyperlink-urls' ),
 				'help'     => __( 'List domains that should NOT get automatically hyperlinked. One domain per line. Do not include URI scheme (e.g. "http://") or trailing slash.', 'auto-hyperlink-urls' ),
 			),
+			'enable_3p_advanced_custom_fields' => array(
+				'input'    => 'checkbox',
+				'default'  => false,
+				'label'    => __( 'Enable support for plugin: Advanced Custom Fields?', 'auto-hyperlink-urls' ),
+			),
 		);
 	}
 
@@ -226,29 +231,32 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	 */
 	public function register_filters() {
 		$options = $this->get_options();
+		$filters = array();
 
-		/**
-		 * Filters Advanced Custom Field hooks that get processed for auto-
-		 * linkification.
-		 *
-		 * Supported hooks:
-		 *    'acf/format_value/type=text',
-		 *    'acf/format_value/type=textarea',
-		 *    'acf/format_value/type=url',
-		 *    'acf_the_content',
-		 *
-		 * @since 3.9
-		 *
-		 * @param array $filters The ACF filters that get processed for auto-
-		 *                       linkification. See filter inline docs for defaults.
-		 */
-		$filters = (array) apply_filters( 'c2c_autohyperlink_urls_acf_filters', array(
-			'acf/format_value/type=text',
-			'acf/format_value/type=textarea',
-			'acf/format_value/type=url',
-			//'acf/format_value/type=wysiwyg',
-			'acf_the_content',
-		) );
+		if ( $options[ 'enable_3p_advanced_custom_fields' ] ) {
+			/**
+			 * Filters Advanced Custom Field hooks that get processed for auto-
+			 * linkification.
+			 *
+			 * Supported hooks:
+			 *    'acf/format_value/type=text',
+			 *    'acf/format_value/type=textarea',
+			 *    'acf/format_value/type=url',
+			 *    'acf_the_content',
+			 *
+			 * @since 3.9
+			 *
+			 * @param array $filters The ACF filters that get processed for auto-
+			 *                       linkification. See filter inline docs for defaults.
+			 */
+			$filters = (array) apply_filters( 'c2c_autohyperlink_urls_acf_filters', array(
+				'acf/format_value/type=text',
+				'acf/format_value/type=textarea',
+				'acf/format_value/type=url',
+				//'acf/format_value/type=wysiwyg',
+				'acf_the_content',
+			) );
+		}
 
 		// Add in relevant stock WP filters.
 		$filters = array_merge( $filters, array( 'the_content', 'the_excerpt', 'widget_text' ) );
