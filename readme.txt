@@ -6,7 +6,7 @@ License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Requires at least: 4.7
 Tested up to: 5.3
-Stable tag: 5.4
+Stable tag: 5.4.1
 
 Automatically turns plaintext URLs and email addresses into links.
 
@@ -299,6 +299,11 @@ add_filter( 'autohyperlink_no_autolink_content_tags', 'my_autohyperlink_no_autol
 
 == Changelog ==
 
+= 5.4.1 (2020-01-16) =
+* Change: Disable Advanced Custom Field (ACF) support by default (it can be activated via new setting)
+* Fix: Fix broken link to plugin help. Props neotrope.
+* Fix: Fix typo in changelog for v5.4
+
 = 5.4 (2019-11-07) =
 Highlights:
 
@@ -351,49 +356,13 @@ Details:
 * Change: Update License URI to be HTTPS
 * Change: Split paragraph in README.md's "Support" section into two
 
-= 5.2 (2018-05-03) =
-Highlights:
-
-* This release consists of fixes for some minor bugs, improved handling of URLs containing parentheses, drops compatibility with versions of WordPress older than 4.7, and some behind-the-scenes changes.
-
-Details:
-
-* Fix: Fix and improve handling of parentheses in URLs
-* Fix: Prevent error when `can_do_hyperlink()` is passed an invalid URL
-* Change: Reformat code (minor) for `hyperlink_urls()` to sync with core coding standards
-* Change: Update plugin framework to 047
-    * 047:
-    * Don't save default setting values to database on install
-    * Change "Cheatin', huh?" error messages to "Something went wrong.", consistent with WP core
-    * Note compatibility through WP 4.9+
-    * Drop compatibility with version of WP older than 4.7
-    * 046:
-    * Fix `reset_options()` to reference instance variable `$options`
-    * Note compatibility through WP 4.7+
-    * Update copyright date (2017)
-    * 045:
-    * Ensure `reset_options()` resets values saved in the database
-* New: Add README.md
-* Change: Store setting name in constant
-* Change: Unit tests:
-    * Sync changes to `Tests_Formatting_MakeClickable` with core's version (largely code formatting changes)
-    * Revamp handling and testing of settings
-    * Simplify implementations of `set_option()`
-    * Add explicit tests for 'strip_protocol' set as true
-    * Default `WP_TESTS_DIR` to `/tmp/wordpress-tests-lib` rather than erroring out if not defined via environment variable
-    * Enable more error output for unit tests
-* Change: Tweak plugin description
-* Change: Add GitHub link to readme
-* Change: Fix code example in readme
-* Change: Modify formatting of hook name in readme to prevent being uppercased when shown in the Plugin Directory
-* Change: Note compatibility through WP 4.9+
-* Change: Drop compatibility with versions of WP older than 4.7
-* Change: Update copyright date (2018)
-
 _Full changelog is available in [CHANGELOG.md](https://github.com/coffee2code/auto-hyperlink-urls/blob/master/CHANGELOG.md)._
 
 
 == Upgrade Notice ==
+
+= 5.4.1 =
+Recommended bugfix release: disabled Advanced Custom Field (ACF) support by default (it can be activated via new setting) and fixed broken link to plugin help.
 
 = 5.4 =
 Feature update: added support for the Advanced Custom Fields plugin, added a filter to customize which HTML tags get excluded from auto-linkification, noted compatibility through WP 5.3, and updated copyright date (2020).

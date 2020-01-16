@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Auto-hyperlink URLs
- * Version:     5.4
+ * Version:     5.4.1
  * Plugin URI:  http://coffee2code.com/wp-plugins/auto-hyperlink-urls/
  * Author:      Scott Reilly
  * Author URI:  http://coffee2code.com/
@@ -18,7 +18,7 @@
  *
  * @package Auto_Hyperlink_URLs
  * @author  Scott Reilly
- * @version 5.4
+ * @version 5.4.1
  */
 
 /*
@@ -110,7 +110,7 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	 * Constructor.
 	 */
 	protected function __construct() {
-		parent::__construct( '5.4', 'autohyperlink-urls', 'c2c', __FILE__, array() );
+		parent::__construct( '5.4.1', 'autohyperlink-urls', 'c2c', __FILE__, array() );
 		// TODO: Temporary fix. The slug specified for the parent constructor
 		// should actually be this value, but at the very least it affects the
 		// plugin's setting name, so changing it requires a migration.

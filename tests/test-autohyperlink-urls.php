@@ -227,7 +227,7 @@ class Autohyperlink_URLs_Test extends WP_UnitTestCase {
 	}
 
 	public function test_get_version() {
-		$this->assertEquals( '5.4', c2c_AutoHyperlinkURLs::get_instance()->version() );
+		$this->assertEquals( '5.4.1', c2c_AutoHyperlinkURLs::get_instance()->version() );
 	}
 
 	public function test_instance_object_is_returned() {

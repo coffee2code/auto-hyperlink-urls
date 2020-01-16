@@ -1,7 +1,7 @@
 # Changelog
 
-## _(in-progress)_
-* Change: Disable Advanced Custom Field (ACF) support by default
+## 5.4.1 _(2020-01-16)_
+* Change: Disable Advanced Custom Field (ACF) support by default (it can be activated via new setting)
 * Fix: Fix broken link to plugin help. Props neotrope.
 * Fix: Fix typo in changelog for v5.4
 
