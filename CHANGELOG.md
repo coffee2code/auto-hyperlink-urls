@@ -2,6 +2,7 @@
 
 ## _(in-progress)_
 * Change: Disable Advanced Custom Field (ACF) support by default
+* Fix: Fix broken link to plugin help. Props neotrope.
 * Fix: Fix typo in changelog for v5.4
 
 ## 5.4 _(2019-11-07)_

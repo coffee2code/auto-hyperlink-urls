@@ -111,6 +111,10 @@ final class c2c_AutoHyperlinkURLs extends c2c_AutoHyperlinkURLs_Plugin_049 {
 	 */
 	protected function __construct() {
 		parent::__construct( '5.4', 'autohyperlink-urls', 'c2c', __FILE__, array() );
+		// TODO: Temporary fix. The slug specified for the parent constructor
+		// should actually be this value, but at the very least it affects the
+		// plugin's setting name, so changing it requires a migration.
+		$this->id_base = 'auto-hyperlink-urls';
 		register_activation_hook( __FILE__, array( __CLASS__, 'activation' ) );
 
 		return self::$instance = $this;
