@@ -1,10 +1,13 @@
 # Changelog
 
+## _(in-progress)_
+* Fix: Fix typo in changelog for v5.4
+
 ## 5.4 _(2019-11-07)_
 
 ### Highlights:
 
-This release adds support for the Advanced Custom Fields plugin, adds a filter to customize whith HTML tags get excluded from auto-linkification, notes compatibility through WP 5.3.
+This release adds support for the Advanced Custom Fields plugin, adds a filter to customize which HTML tags get excluded from auto-linkification, and notes compatibility through WP 5.3.
 
 ### Details:
 

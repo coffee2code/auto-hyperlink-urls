@@ -302,7 +302,7 @@ add_filter( 'autohyperlink_no_autolink_content_tags', 'my_autohyperlink_no_autol
 = 5.4 (2019-11-07) =
 Highlights:
 
-* This release adds support for the Advanced Custom Fields plugin, adds a filter to customize whith HTML tags get excluded from auto-linkification, notes compatibility through WP 5.3.
+* This release adds support for the Advanced Custom Fields plugin, adds a filter to customize which HTML tags get excluded from auto-linkification, and notes compatibility through WP 5.3.
 
 Details:
 
@@ -396,7 +396,7 @@ _Full changelog is available in [CHANGELOG.md](https://github.com/coffee2code/au
 == Upgrade Notice ==
 
 = 5.4 =
-Feature update: added support for the Advanced Custom Fields plugin, added a filter to customize whith HTML tags get excluded from auto-linkification, noted compatibility through WP 5.3, and updated copyright date (2020).
+Feature update: added support for the Advanced Custom Fields plugin, added a filter to customize which HTML tags get excluded from auto-linkification, noted compatibility through WP 5.3, and updated copyright date (2020).
 
 = 5.3 =
 Minor update: tweaked plugin initialization, updated plugin framework to v049, noted compatibility through WP 5.1+, created CHANGELOG.md to store historical changelog outside of readme.txt, and updated copyright date (2019).
